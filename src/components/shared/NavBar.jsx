@@ -4,13 +4,14 @@ import Link from "next/link";
 import { useState } from "react";
 
 const NavBar = () => {
+  const [open, setOpen] = useState(false);
+
   const navItems = [
     { label: "Home", href: "/" },
     { label: "All Properties", href: "/properties" },
   ];
 
-  const [open, setOpen] = useState(false);
-
+  const userRole = "tenant";
   const isLoggedIn = true;
   const userAvatarUrl = null;
   const userName = "";
@@ -64,23 +65,9 @@ const NavBar = () => {
             </>
           ) : (
             <>
-              <Link href="/" className={btnOutline}>
+              <Link href={`/${userRole}/dashboard`} className={btnOutline}>
                 Dashboard
               </Link>
-              {/* <button
-                aria-label="Account"
-                className="flex h-10 w-10 items-center justify-center rounded-full overflow-hidden border border-[#E5E7EB] bg-white"
-              >
-                {userAvatarUrl ? (
-                  <img
-                    src={userAvatarUrl}
-                    alt={userName}
-                    className="h-full w-full object-cover"
-                  />
-                ) : (
-                  <Person className="h-5 w-5 text-[#3E4E50]" />
-                )}
-              </button> */}
               <button className={btnAccent}>Logout</button>
             </>
           )}
@@ -120,14 +107,14 @@ const NavBar = () => {
             {!isLoggedIn ? (
               <>
                 <Link
-                  href="/"
+                  href="/login"
                   className={`${btnOutline} w-full`}
                   onClick={() => setOpen(false)}
                 >
                   Login
                 </Link>
                 <Link
-                  href="/"
+                  href="/register"
                   className={`${btnAccent} w-full`}
                   onClick={() => setOpen(false)}
                 >
@@ -137,7 +124,7 @@ const NavBar = () => {
             ) : (
               <>
                 <Link
-                  href="/"
+                  href={`/${userRole}/dashboard`}
                   className={`${btnOutline} w-full`}
                   onClick={() => setOpen(false)}
                 >
