@@ -10,13 +10,39 @@ import {
   Person,
   Xmark,
 } from "@gravity-ui/icons";
+import { toast } from "@heroui/react";
 import Image from "next/image";
 import Link from "next/link";
 import { useCallback, useRef, useState } from "react";
 import GoogleSignIn from "../shared/auth/GoogleSignIn";
 import OrDivider from "../shared/auth/OrDivider";
 
-// Password strength indicator
+// ── ImgBB Upload ─────────────────────────────────────────────────────────────
+// .env.local এ NEXT_PUBLIC_IMGBB_API_KEY=your_key_here রাখুন
+
+async function uploadToImgBB(file) {
+  const apiKey = process.env.NEXT_PUBLIC_IMGBB_API_KEY;
+  if (!apiKey) throw new Error("ImgBB API key is missing.");
+
+  const formData = new FormData();
+  formData.append("image", file);
+
+  const res = await fetch(`https://api.imgbb.com/1/upload?key=${apiKey}`, {
+    method: "POST",
+    body: formData,
+  });
+
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err?.error?.message || "ImgBB upload failed.");
+  }
+
+  const data = await res.json();
+
+  return data.data.display_url;
+}
+
+// ── Password Strength ─────────────────────────────────────────────────────────
 
 function getPasswordStrength(pw) {
   if (!pw) return { score: 0, label: "", color: "" };
@@ -52,7 +78,15 @@ function PasswordStrengthBar({ password }) {
         ))}
       </div>
       <p
-        className={`text-xs ${score <= 1 ? "text-red-400" : score === 2 ? "text-amber-500" : score === 3 ? "text-yellow-600" : "text-emerald-600"}`}
+        className={`text-xs ${
+          score <= 1
+            ? "text-red-400"
+            : score === 2
+              ? "text-amber-500"
+              : score === 3
+                ? "text-yellow-600"
+                : "text-emerald-600"
+        }`}
       >
         {label}
       </p>
@@ -60,7 +94,7 @@ function PasswordStrengthBar({ password }) {
   );
 }
 
-// Avatar Upload Zone
+// ── Avatar Upload Zone ────────────────────────────────────────────────────────
 
 function AvatarUpload({ preview, onFile }) {
   const inputRef = useRef(null);
@@ -68,8 +102,11 @@ function AvatarUpload({ preview, onFile }) {
 
   const handleFile = (file) => {
     if (!file || !file.type.startsWith("image/")) return;
-    const url = URL.createObjectURL(file);
-    onFile(url);
+    if (file.size > 5 * 1024 * 1024) {
+      toast.warning("File size must be under 5 MB.");
+      return;
+    }
+    onFile(file);
   };
 
   const onDrop = useCallback(
@@ -95,7 +132,11 @@ function AvatarUpload({ preview, onFile }) {
         className={`
           relative w-16 h-16 rounded-full border-2 flex items-center justify-center cursor-pointer
           overflow-hidden flex-shrink-0 group transition-all duration-200
-          ${dragging ? "border-[#C89B3C] scale-105" : "border-[#E5E7EB] hover:border-[#C89B3C]/60"}
+          ${
+            dragging
+              ? "border-[#C89B3C] scale-105"
+              : "border-[#E5E7EB] hover:border-[#C89B3C]/60"
+          }
         `}
         role="button"
         aria-label="Upload profile photo"
@@ -149,7 +190,7 @@ function AvatarUpload({ preview, onFile }) {
   );
 }
 
-// Reusable form field
+// ── Reusable Field ────────────────────────────────────────────────────────────
 
 function Field({
   id,
@@ -180,7 +221,6 @@ function Field({
         {label}
       </label>
       <div className="relative">
-        {/* Left icon */}
         {Icon && (
           <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[#9CA3AF] pointer-events-none flex">
             <Icon width={14} height={14} />
@@ -204,14 +244,12 @@ function Field({
             ${borderClass}
           `}
         />
-        {/* Right slot (toggle, check icon, etc.) */}
         {rightSlot && (
           <span className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center">
             {rightSlot}
           </span>
         )}
       </div>
-      {/* Feedback line */}
       {error && (
         <p className="mt-1 text-xs text-red-500 flex items-center gap-1">
           <Xmark width={11} height={11} /> {error}
@@ -229,7 +267,7 @@ function Field({
   );
 }
 
-// Progress steps for multi-step UX hint
+// ── Step Dots ─────────────────────────────────────────────────────────────────
 
 function StepDots({ current, total }) {
   return (
@@ -250,6 +288,8 @@ function StepDots({ current, total }) {
   );
 }
 
+// ── Registration Form ─────────────────────────────────────────────────────────
+
 const RegistrationForm = () => {
   const [form, setForm] = useState({
     name: "",
@@ -257,16 +297,27 @@ const RegistrationForm = () => {
     password: "",
     confirm: "",
   });
+
+  const [avatarFile, setAvatarFile] = useState(null);
   const [avatarPreview, setAvatarPreview] = useState(null);
+
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const [touched, setTouched] = useState({});
   const [isLoading, setIsLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [submitError, setSubmitError] = useState(null);
 
   const set = (key) => (e) => {
     setForm((f) => ({ ...f, [key]: e.target.value }));
     setTouched((t) => ({ ...t, [key]: true }));
+  };
+
+  const handleAvatarFile = (file) => {
+    setAvatarFile(file);
+
+    const previewUrl = URL.createObjectURL(file);
+    setAvatarPreview(previewUrl);
   };
 
   // ── Validation ──────────────────────────────────────────────────────────
@@ -304,7 +355,6 @@ const RegistrationForm = () => {
     form.password.length >= 8 &&
     form.confirm === form.password;
 
-  // Determine progress for step dots (0-based field completion)
   const fieldsComplete = [
     form.name.trim().length >= 2,
     /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email),
@@ -312,23 +362,36 @@ const RegistrationForm = () => {
     form.confirm === form.password && form.confirm.length > 0,
   ].filter(Boolean).length;
 
-  const handleSubmit = (e) => {
+  // ── Submit: ImgBB upload → server ───────────────────────────────────────
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setTouched({ name: true, email: true, password: true, confirm: true });
-    const userData = {
-      name: form.name.trim(),
-      email: form.email.trim(),
-      password: form.password,
-      avatar: avatarPreview,
-    };
+    setSubmitError(null);
     if (!isValid) return;
-    setIsLoading(true);
-    console.log(userData, "prevSub");
 
-    setTimeout(() => {
-      setIsLoading(false);
+    setIsLoading(true);
+
+    try {
+      let avatarUrl = null;
+      if (avatarFile) {
+        avatarUrl = await uploadToImgBB(avatarFile);
+      }
+
+      const userData = {
+        name: form.name.trim(),
+        email: form.email.trim(),
+        password: form.password,
+        avatar: avatarUrl,
+      };
+
+      await new Promise((r) => setTimeout(r, 1800));
+
       setSubmitted(true);
-    }, 1800);
+    } catch (err) {
+      toast.warning(err.message || "Something went wrong. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   // ── Success state ───────────────────────────────────────────────────────
@@ -361,7 +424,7 @@ const RegistrationForm = () => {
   }
 
   return (
-    <div className=" lg:w-[48%] flex items-center justify-center px-6 py-12 lg:py-0">
+    <div className="lg:w-[48%] flex items-center justify-center px-6 py-12 lg:py-0">
       <div className="w-full max-w-120">
         {/* Mobile logo */}
         <div className="flex items-center gap-2 mb-8 lg:hidden">
@@ -396,7 +459,7 @@ const RegistrationForm = () => {
             <p className="text-xs font-medium text-[#1B1B1B] mb-2 tracking-wide">
               Profile photo
             </p>
-            <AvatarUpload preview={avatarPreview} onFile={setAvatarPreview} />
+            <AvatarUpload preview={avatarPreview} onFile={handleAvatarFile} />
           </div>
 
           {/* Thin rule */}
@@ -506,22 +569,29 @@ const RegistrationForm = () => {
             .
           </p>
 
+          {/* Server/upload error */}
+          {submitError && (
+            <p className="text-xs text-red-500 flex items-center gap-1">
+              <Xmark width={11} height={11} /> {submitError}
+            </p>
+          )}
+
           {/* Submit */}
           <div className="pt-1">
             <button
               type="submit"
               disabled={isLoading}
               className="
-                  w-full h-10 flex items-center justify-center gap-2
-                  bg-[#3E4E50] text-white text-sm font-medium
-                  rounded-[6px] tracking-wide
-                  transition-all duration-200
-                  hover:bg-[#344244]
-                  active:scale-[0.99]
-                  disabled:opacity-60 disabled:cursor-not-allowed
-                  focus-visible:outline-none focus-visible:ring-2
-                  focus-visible:ring-[#3E4E50] focus-visible:ring-offset-2
-                "
+                w-full h-10 flex items-center justify-center gap-2
+                bg-[#3E4E50] text-white text-sm font-medium
+                rounded-[6px] tracking-wide
+                transition-all duration-200
+                hover:bg-[#344244]
+                active:scale-[0.99]
+                disabled:opacity-60 disabled:cursor-not-allowed
+                focus-visible:outline-none focus-visible:ring-2
+                focus-visible:ring-[#3E4E50] focus-visible:ring-offset-2
+              "
             >
               {isLoading ? (
                 <span className="flex items-center gap-2">
@@ -544,7 +614,7 @@ const RegistrationForm = () => {
                       d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
                     />
                   </svg>
-                  Creating account…
+                  {avatarFile ? "Uploading photo…" : "Creating account…"}
                 </span>
               ) : (
                 <span className="flex items-center gap-2">

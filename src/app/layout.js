@@ -1,5 +1,6 @@
 import Footer from "@/components/shared/Footer";
 import NavBar from "@/components/shared/NavBar";
+import { Toast } from "@heroui/react";
 import { Geist_Mono } from "next/font/google";
 import "./globals.css";
 
@@ -22,6 +23,7 @@ export default function RootLayout({ children }) {
       className={`${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
+        <Toast.Provider />
         <NavBar />
         {children}
         <Footer />
