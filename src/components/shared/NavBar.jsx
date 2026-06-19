@@ -1,9 +1,14 @@
 "use client";
-import { Bars, HouseFill, Xmark } from "@gravity-ui/icons";
+import { Bars, Xmark } from "@gravity-ui/icons";
+import { Button } from "@heroui/react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useState } from "react";
+import NavLink from "./NavLink";
+import NestrixLogo from "./NestrixLogo";
 
 const NavBar = () => {
+  const pathName = usePathname();
   const [open, setOpen] = useState(false);
 
   const navItems = [
@@ -11,12 +16,10 @@ const NavBar = () => {
     { label: "All Properties", href: "/properties" },
   ];
 
-  const userRole = "tenant";
-  const isLoggedIn = true;
+  const userRole = null; //"tenant";
+  const isLoggedIn = false; // true;
   const userAvatarUrl = null;
   const userName = "";
-  const navLink =
-    "px-4 py-2 text-[15px] font-medium text-[#5B5B5B] rounded-xl transition-colors duration-200 hover:text-[#3E4E50] hover:bg-[#3E4E50]/5 data-[status=active]:text-[#3E4E50] data-[status=active]:font-semibold";
 
   const navLinkMobile =
     "px-4 py-3.5 text-base font-medium text-[#5B5B5B] rounded-xl transition-colors duration-200 hover:text-[#3E4E50] hover:bg-[#3E4E50]/5 data-[status=active]:text-[#3E4E50] data-[status=active]:bg-[#C89B3C]/10 data-[status=active]:font-semibold";
@@ -29,26 +32,21 @@ const NavBar = () => {
 
   return (
     <header className="sticky top-0 z-50 w-full bg-white border-b border-[#E5E7EB] shadow-[0_1px_2px_rgba(16,24,40,0.04),0_4px_16px_rgba(16,24,40,0.04)]">
-      <div className="mx-auto flex h-20 max-w-[1280px] items-center justify-between px-5 sm:px-8">
+      <div className="mx-auto flex h-16 max-w-[1280px] items-center justify-between px-5 sm:px-8">
         {/* Left: Logo */}
         <Link href="/" className="flex items-center gap-2.5 group">
-          <span
-            className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-[#D9AE52] to-[#C89B3C] shadow-[0_4px_12px_rgba(200,155,60,0.25)] transition-transform duration-300 group-hover:scale-105"
-            aria-hidden
-          >
-            <HouseFill className="h-5 w-5 text-white" />
-          </span>
-          <span className="text-[22px] font-semibold tracking-tight text-[#3E4E50]">
-            Nestrix
-          </span>
+          <NestrixLogo />
         </Link>
 
         {/* Center: Nav */}
         <nav className="hidden lg:flex items-center gap-1">
           {navItems.map((item) => (
-            <Link key={item.href} href={item.href} className={navLink}>
-              {item.label}
-            </Link>
+            <NavLink
+              key={item.href}
+              href={item.href}
+              label={item.label}
+              pathName={pathName}
+            />
           ))}
         </nav>
 
@@ -56,17 +54,22 @@ const NavBar = () => {
         <div className="hidden lg:flex items-center gap-3">
           {!isLoggedIn ? (
             <>
-              <Link href="/" className={btnOutline}>
+              <Link href="/login" className={btnOutline}>
                 Login
               </Link>
-              <Link href="/" className={btnAccent}>
+              <Link href="/register" className={btnAccent}>
                 Register
               </Link>
             </>
           ) : (
             <>
-              <Link href={`/${userRole}/dashboard`} className={btnOutline}>
-                Dashboard
+              <Link href={`/${userRole}/dashboard`}>
+                <Button
+                  variant="outline"
+                  className={`rounded-lg hover:text-foreground ${pathName == `/${userRole}/dashboard` ? "border border-accent text-accent" : "text-primary"}`}
+                >
+                  Dashboard
+                </Button>
               </Link>
               <button className={btnAccent}>Logout</button>
             </>
@@ -94,14 +97,13 @@ const NavBar = () => {
       >
         <div className="px-5 sm:px-8 py-5 flex flex-col gap-1">
           {navItems.map((item) => (
-            <Link
+            <NavLink
               key={item.href}
               href={item.href}
+              label={item.label}
+              pathName={pathName}
               onClick={() => setOpen(false)}
-              className={navLinkMobile}
-            >
-              {item.label}
-            </Link>
+            />
           ))}
           <div className="mt-4 flex flex-col gap-2.5">
             {!isLoggedIn ? (
@@ -125,10 +127,14 @@ const NavBar = () => {
               <>
                 <Link
                   href={`/${userRole}/dashboard`}
-                  className={`${btnOutline} w-full`}
                   onClick={() => setOpen(false)}
                 >
-                  Dashboard
+                  <Button
+                    variant="outline"
+                    className={`rounded-lg w-full hover:text-foreground ${pathName == `/${userRole}/dashboard` ? "border border-accent text-accent" : "text-primary"}`}
+                  >
+                    Dashboard
+                  </Button>
                 </Link>
                 <button className={`${btnAccent} w-full`}>Logout</button>
               </>

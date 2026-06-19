@@ -3,6 +3,7 @@
 import { Clock, Envelope, Handset, MapPin } from "@gravity-ui/icons";
 import Link from "next/link";
 import { useState } from "react";
+import NestrixLogo from "./NestrixLogo";
 
 function XIcon({ className, size = 20 }) {
   return (
@@ -106,33 +107,7 @@ const Footer = () => {
           {/* Brand column */}
           <div className="flex flex-col gap-5">
             <Link href="/" className="flex items-center gap-2.5 group w-fit">
-              <span
-                className="flex h-9 w-9 items-center justify-center rounded-lg transition-transform duration-300 group-hover:scale-105"
-                style={{
-                  background:
-                    "linear-gradient(135deg, #D9AE52 0%, #C89B3C 100%)",
-                  boxShadow: "0 4px 10px rgba(200,155,60,0.25)",
-                }}
-                aria-hidden
-              >
-                <svg
-                  width="18"
-                  height="18"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="#FFFFFF"
-                  strokeWidth="2.25"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  aria-hidden
-                >
-                  <path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5z" />
-                  <path d="M9 21V12h6v9" />
-                </svg>
-              </span>
-              <span className="text-xl font-semibold tracking-tight text-foreground">
-                Nestrix
-              </span>
+              <NestrixLogo />
             </Link>
 
             <p className="text-sm leading-relaxed max-w-xs text-muted-foreground">
