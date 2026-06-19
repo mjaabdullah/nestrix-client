@@ -1,4 +1,5 @@
 "use client";
+import { useSession } from "@/lib/auth-client";
 import { Bars, Xmark } from "@gravity-ui/icons";
 import { Button } from "@heroui/react";
 import Link from "next/link";
@@ -10,16 +11,17 @@ import NestrixLogo from "./NestrixLogo";
 const NavBar = () => {
   const pathName = usePathname();
   const [open, setOpen] = useState(false);
+  const { data: session } = useSession();
+  const user = session?.user;
+  console.log(user, "session");
 
   const navItems = [
     { label: "Home", href: "/" },
     { label: "All Properties", href: "/properties" },
   ];
 
-  const userRole = null; //"tenant";
-  const isLoggedIn = false; // true;
-  const userAvatarUrl = null;
-  const userName = "";
+  const userRole = user?.role || null; //"tenant";
+  const isLoggedIn = !!user; // true;
 
   const navLinkMobile =
     "px-4 py-3.5 text-base font-medium text-[#5B5B5B] rounded-xl transition-colors duration-200 hover:text-[#3E4E50] hover:bg-[#3E4E50]/5 data-[status=active]:text-[#3E4E50] data-[status=active]:bg-[#C89B3C]/10 data-[status=active]:font-semibold";

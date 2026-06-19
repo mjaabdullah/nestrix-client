@@ -1,4 +1,5 @@
 "use client";
+import { authClient } from "@/lib/auth-client";
 import {
   ArrowRight,
   At,
@@ -381,10 +382,23 @@ const RegistrationForm = () => {
         name: form.name.trim(),
         email: form.email.trim(),
         password: form.password,
-        avatar: avatarUrl,
+        image: avatarUrl,
+        role: "tenant",
       };
 
-      await new Promise((r) => setTimeout(r, 1800));
+      const { data, error } = await authClient.signUp.email({
+        ...userData,
+      });
+
+      console.log(data, "data");
+      console.log(error, "error");
+
+      if (error) {
+        toast.warning(
+          error.message || "Registration failed. Please try again.",
+        );
+        return;
+      }
 
       setSubmitted(true);
     } catch (err) {
