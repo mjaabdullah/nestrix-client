@@ -2,8 +2,10 @@
 
 import GoogleSignIn from "@/components/shared/auth/GoogleSignIn";
 import OrDivider from "@/components/shared/auth/OrDivider";
+import { authClient } from "@/lib/auth-client";
 import { ArrowRight, Eye, EyeSlash } from "@gravity-ui/icons";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 // ─── Inline SVG architectural illustration ───────────────────────────────────
 function ArchitecturalHero() {
@@ -513,17 +515,30 @@ function ArchitecturalHero() {
 
 // ─── Main Login Page ──────────────────────────────────────────────────────────
 const LoginPage = () => {
+  const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
+    const { data, error } = await authClient.signIn.email({
+      email: email, // required
+      password: password, // required
+      rememberMe: rememberMe,
+    });
 
-    setTimeout(() => setIsLoading(false), 1800);
+    if (error) {
+      toast.warning(error.message || "Login failed. Please try again.");
+      return;
+    }
+    if (data) {
+      router.push("/");
+      router.refresh();
+    }
   };
 
   return (

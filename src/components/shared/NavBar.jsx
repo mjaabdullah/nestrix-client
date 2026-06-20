@@ -1,19 +1,25 @@
 "use client";
-import { useSession } from "@/lib/auth-client";
+import { authClient, useSession } from "@/lib/auth-client";
 import { Bars, Xmark } from "@gravity-ui/icons";
 import { Button } from "@heroui/react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 import NavLink from "./NavLink";
 import NestrixLogo from "./NestrixLogo";
 
 const NavBar = () => {
   const pathName = usePathname();
+  const router = useRouter();
   const [open, setOpen] = useState(false);
   const { data: session } = useSession();
   const user = session?.user;
-  console.log(user, "session");
+
+  const handleLogOut = async () => {
+    await authClient.signOut();
+
+    router.push("/login");
+  };
 
   const navItems = [
     { label: "Home", href: "/" },
@@ -22,9 +28,6 @@ const NavBar = () => {
 
   const userRole = user?.role || null; //"tenant";
   const isLoggedIn = !!user; // true;
-
-  const navLinkMobile =
-    "px-4 py-3.5 text-base font-medium text-[#5B5B5B] rounded-xl transition-colors duration-200 hover:text-[#3E4E50] hover:bg-[#3E4E50]/5 data-[status=active]:text-[#3E4E50] data-[status=active]:bg-[#C89B3C]/10 data-[status=active]:font-semibold";
 
   const btnOutline =
     "inline-flex items-center justify-center h-10 px-[18px] text-[15px] font-semibold text-[#3E4E50] bg-white border border-[#E5E7EB] rounded-xl transition-all duration-200 hover:border-[#3E4E50] hover:bg-[#3E4E50]/5 hover:-translate-y-px";
@@ -73,7 +76,9 @@ const NavBar = () => {
                   Dashboard
                 </Button>
               </Link>
-              <button className={btnAccent}>Logout</button>
+              <button className={btnAccent} onClick={handleLogOut}>
+                Logout
+              </button>
             </>
           )}
         </div>

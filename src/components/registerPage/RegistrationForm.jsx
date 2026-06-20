@@ -390,8 +390,6 @@ const RegistrationForm = () => {
         ...userData,
       });
 
-      console.log(data, "data");
-      console.log(error, "error");
 
       if (error) {
         toast.warning(
