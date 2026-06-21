@@ -11,7 +11,11 @@ export async function proxy(request) {
 
   // Guest User
   if (!session) {
-    if (pathname.startsWith("/tenant") || pathname.startsWith("/admin")) {
+    if (
+      pathname.startsWith("/tenant") ||
+      pathname.startsWith("/admin") ||
+      pathname.startsWith("/properties/details/")
+    ) {
       return NextResponse.redirect(new URL("/login", request.url));
     }
 
@@ -39,5 +43,11 @@ export async function proxy(request) {
 }
 
 export const config = {
-  matcher: ["/login", "/register", "/tenant/:path*", "/admin/:path*"],
+  matcher: [
+    "/login",
+    "/register",
+    "/tenant/:path*",
+    "/admin/:path*",
+    "/properties/:path*",
+  ],
 };
