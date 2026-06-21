@@ -14,6 +14,8 @@ const NavBar = () => {
   const [open, setOpen] = useState(false);
   const { data: session } = useSession();
   const user = session?.user;
+  const userRole = user?.role || null; //"tenant";
+  const isLoggedIn = !!user; // true;
 
   const handleLogOut = async () => {
     await authClient.signOut();
@@ -25,9 +27,6 @@ const NavBar = () => {
     { label: "Home", href: "/" },
     { label: "All Properties", href: "/properties" },
   ];
-
-  const userRole = user?.role || null; //"tenant";
-  const isLoggedIn = !!user; // true;
 
   const btnOutline =
     "inline-flex items-center justify-center h-10 px-[18px] text-[15px] font-semibold text-[#3E4E50] bg-white border border-[#E5E7EB] rounded-xl transition-all duration-200 hover:border-[#3E4E50] hover:bg-[#3E4E50]/5 hover:-translate-y-px";

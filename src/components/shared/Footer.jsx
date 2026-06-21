@@ -223,7 +223,7 @@ const Footer = () => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="Enter your email address"
-              className="h-12 flex-1 rounded-xl px-4 text-sm outline-none transition-all duration-200 focus:ring-2 focus:ring-accent"
+              className="h-12 flex-1 rounded-xl py-3 px-4 text-sm outline-none transition-all duration-200 focus:ring-2 focus:ring-accent"
               style={{
                 background: "rgba(255,255,255,0.06)",
                 color: "var(--brand-footer-text)",
