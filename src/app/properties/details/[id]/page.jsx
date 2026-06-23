@@ -1,5 +1,6 @@
 import BookingSection from "@/components/propertydetails/BookingSection";
 import PropertyDetails from "@/components/propertydetails/PropertyDetails";
+import ReviewForm from "@/components/propertydetails/ReviewForm";
 import ReviewsSection from "@/components/propertydetails/ReviewsSection";
 
 async function getProperty(id) {
@@ -98,6 +99,10 @@ const PropertyDetailsPage = async (params) => {
               averageRating={property.averageRating}
               totalReviews={property.totalReviews}
             />
+            {/* 3. Add a review */}
+            <div className="mt-6">
+              <ReviewForm propertyId={property._id} />
+            </div>
           </div>
 
           {/* RIGHT — sticky booking */}
