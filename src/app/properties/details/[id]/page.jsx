@@ -78,7 +78,6 @@ async function getReviews(propertyId) {
 const PropertyDetailsPage = async ({ params }) => {
   const { id } = await params;
   const property = await getPropertyById(id);
-  console.log("id", property);
 
   //
   const [reviews] = await Promise.all([getReviews(id)]);

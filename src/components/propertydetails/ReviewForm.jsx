@@ -1,5 +1,7 @@
 "use client";
 
+import { useSession } from "@/lib/auth-client";
+import { saveReview } from "@/lib/core/reviews";
 import { useState } from "react";
 import { FaRegStar, FaStar } from "react-icons/fa";
 
@@ -12,6 +14,8 @@ const RATING_LABELS = {
 };
 
 export default function ReviewForm({ propertyId }) {
+  const { data: session } = useSession();
+  const user = session?.user;
   const [rating, setRating] = useState(0);
   const [hovered, setHovered] = useState(0);
   const [comment, setComment] = useState("");
@@ -20,15 +24,25 @@ export default function ReviewForm({ propertyId }) {
   const handleSubmit = async () => {
     if (!rating || !comment.trim()) return;
 
+    const ratingData = {
+      name: user.name,
+      image: user.image,
+      userId: user.id,
+      rating,
+      comment,
+      propertyId,
+    };
+
     setStatus("loading");
 
     try {
-      // TODO:  API
-      setInterval(() => {}, 2000);
+      const res = await saveReview(ratingData);
 
-      setStatus("success");
-      setRating(0);
-      setComment("");
+      if (res.insertedId) {
+        setStatus("success");
+        setRating(0);
+        setComment("");
+      }
     } catch (err) {
       setStatus("error");
     }
