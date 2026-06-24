@@ -2,6 +2,7 @@ import BookingSection from "@/components/propertydetails/BookingSection";
 import PropertyDetails from "@/components/propertydetails/PropertyDetails";
 import ReviewForm from "@/components/propertydetails/ReviewForm";
 import ReviewsSection from "@/components/propertydetails/ReviewsSection";
+import { getPropertyById } from "@/lib/core/property";
 
 async function getProperty(id) {
   return {
@@ -74,14 +75,17 @@ async function getReviews(propertyId) {
   ];
 }
 
-const PropertyDetailsPage = async (params) => {
+const PropertyDetailsPage = async ({ params }) => {
   const { id } = await params;
+  const property = await getPropertyById(id);
+  console.log("id", property);
 
-  // Both fetches run in parallel
-  const [property, reviews] = await Promise.all([
-    getProperty(id),
-    getReviews(id),
-  ]);
+  //
+  const [reviews] = await Promise.all([getReviews(id)]);
+  // const [property, reviews] = await Promise.all([
+  //   getProperty(id),
+  //   getReviews(id),
+  // ]);
 
   return (
     <main className="min-h-screen bg-background text-foreground">
