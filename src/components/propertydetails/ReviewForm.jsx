@@ -2,6 +2,7 @@
 
 import { useSession } from "@/lib/auth-client";
 import { saveReview } from "@/lib/core/reviews";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { FaRegStar, FaStar } from "react-icons/fa";
 
@@ -14,6 +15,7 @@ const RATING_LABELS = {
 };
 
 export default function ReviewForm({ propertyId }) {
+  const router = useRouter();
   const { data: session } = useSession();
   const user = session?.user;
   const [rating, setRating] = useState(0);
@@ -42,6 +44,7 @@ export default function ReviewForm({ propertyId }) {
         setStatus("success");
         setRating(0);
         setComment("");
+        router.refresh();
       }
     } catch (err) {
       setStatus("error");

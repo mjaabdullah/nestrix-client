@@ -3,6 +3,7 @@ import PropertyDetails from "@/components/propertydetails/PropertyDetails";
 import ReviewForm from "@/components/propertydetails/ReviewForm";
 import ReviewsSection from "@/components/propertydetails/ReviewsSection";
 import { getPropertyById } from "@/lib/core/property";
+import { getReviewsByPropertyId } from "@/lib/core/reviews";
 
 async function getProperty(id) {
   return {
@@ -80,11 +81,13 @@ const PropertyDetailsPage = async ({ params }) => {
   const property = await getPropertyById(id);
 
   //
-  const [reviews] = await Promise.all([getReviews(id)]);
-  // const [property, reviews] = await Promise.all([
-  //   getProperty(id),
-  //   getReviews(id),
-  // ]);
+  const reviews = await getReviewsByPropertyId(id);
+  const totalReviews = reviews?.length;
+  const totalRating = reviews.reduce((acc, review) => {
+    return acc + review.rating;
+  }, 0);
+
+  const averageRating = totalRating / totalReviews || 0;
 
   return (
     <main className="min-h-screen bg-background text-foreground">
@@ -94,13 +97,17 @@ const PropertyDetailsPage = async ({ params }) => {
           {/* LEFT — property info + reviews */}
           <div className="min-w-0 space-y-0">
             {/* 1. property details */}
-            <PropertyDetails property={property} />
+            <PropertyDetails
+              property={property}
+              averageRating={averageRating}
+              totalReviews={totalReviews}
+            />
 
             {/* 2. Reviews */}
             <ReviewsSection
               reviews={reviews}
-              averageRating={property.averageRating}
-              totalReviews={property.totalReviews}
+              averageRating={averageRating}
+              totalReviews={totalReviews}
             />
             {/* 3. Add a review */}
             <div className="mt-6">

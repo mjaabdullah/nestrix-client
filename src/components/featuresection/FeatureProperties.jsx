@@ -3,7 +3,6 @@ import FeatureSection from "./FeatureSection";
 
 const FeatureProperties = async () => {
   const properties = await getFeaturedProperties();
-  console.log(properties);
 
   return (
     <>

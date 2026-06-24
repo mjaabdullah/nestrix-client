@@ -31,7 +31,7 @@ const EXTRA_ICONS = {
   "Shopping Mall Nearby": <FaShoppingBag className="w-3.5 h-3.5" />,
 };
 
-const PropertyDetails = ({ property }) => {
+const PropertyDetails = ({ property, averageRating, totalReviews }) => {
   return (
     <div className="space-y-10">
       {/* ── HEADER ── */}
@@ -67,10 +67,8 @@ const PropertyDetails = ({ property }) => {
           </span>
           <span className="flex items-center gap-1.5">
             <FaStar className="w-3.5 h-3.5 text-amber-400" />
-            <span className="text-foreground font-medium">
-              {property.averageRating}
-            </span>
-            <span>({property.totalReviews} reviews)</span>
+            <span className="text-foreground font-medium">{averageRating}</span>
+            <span>({totalReviews} reviews)</span>
           </span>
         </div>
 

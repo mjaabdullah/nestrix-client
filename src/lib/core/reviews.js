@@ -11,3 +11,9 @@ export const saveReview = async (review) => {
 
   return res.json();
 };
+
+export const getReviewsByPropertyId = async (propertyId) => {
+  const res = await fetch(`${url}/api/reviews/${propertyId}`);
+  const reviews = await res.json();
+  return reviews;
+};
