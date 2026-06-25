@@ -24,7 +24,7 @@ const SearchPanel = () => {
       initial={{ opacity: 0, y: 32 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.65, delay: 0.7, ease: [0.22, 1, 0.36, 1] }}
-      className="relative z-10 max-w-[1320px] mx-auto px-6 lg:px-12 pb-20 lg:pb-28"
+      className="relative z-10 max-w-[1320px] mx-auto px-6 lg:px-12 pb-2 lg:pb-5"
     >
       <div className="border border-border rounded-[10px] bg-background p-4 lg:p-5">
         {/* Panel label */}

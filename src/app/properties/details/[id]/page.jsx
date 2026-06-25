@@ -87,7 +87,7 @@ const PropertyDetailsPage = async ({ params }) => {
     return acc + review.rating;
   }, 0);
 
-  const averageRating = totalRating / totalReviews || 0;
+  const averageRating = (totalRating / totalReviews || 0).toFixed(1);
 
   return (
     <main className="min-h-screen bg-background text-foreground">
