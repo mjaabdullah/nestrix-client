@@ -2,8 +2,9 @@ import BookingSection from "@/components/propertydetails/BookingSection";
 import PropertyDetails from "@/components/propertydetails/PropertyDetails";
 import ReviewForm from "@/components/propertydetails/ReviewForm";
 import ReviewsSection from "@/components/propertydetails/ReviewsSection";
-import { getPropertyById } from "@/lib/core/property";
+
 import { getReviewsByPropertyId } from "@/lib/core/reviews";
+import { getPropertyById } from "@/lib/getproperty";
 
 async function getProperty(id) {
   return {
