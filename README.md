@@ -1,36 +1,63 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Nestrix
 
-## Getting Started
+A modern Property Rental & Booking Marketplace that connects tenants and property owners through a secure and user-friendly platform. Users can browse properties, make bookings, manage listings, and complete payments online.
 
-First, run the development server:
+## Live URL
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+🔗 https://nestrix.vercel.app/
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Purpose
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+Nestrix helps property owners list rental properties and allows tenants to discover, save, book, and review properties through a transparent and secure rental marketplace.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Key Features
 
-## Learn More
+- User Authentication (Email/Password & Google Login)
+- JWT-Based Authorization
+- Role-Based Access Control (Tenant, Owner, Admin)
+- Property Listing & Management
+- Property Search, Filtering & Sorting
+- Add to Favorites
+- Property Booking System
+- Stripe Payment Integration
+- Property Reviews & Ratings
+- Owner Analytics Dashboard
+- Admin Moderation System
+- Pagination Implementation
+- Responsive Design for Mobile, Tablet & Desktop
 
-To learn more about Next.js, take a look at the following resources:
+## Technologies Used
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Frontend
+- Next.js
+- JavaScript
+- Tailwind CSS v4
+- HeroUI v3
+- Framer Motion
+- React Icons
+- Gravity UI Icons
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
 
-## Deploy on Vercel
+### Backend
+- Node.js
+- Express.js
+- MongoDB
+- JWT
+- Stripe
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## NPM Packages Used
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### Client
+- @heroui/react
+- framer-motion
+- react-icons
+- @gravity-ui/icons
+
+
+### Server
+- express
+- mongodb
+- jsonwebtoken
+- cors
+- dotenv
+- stripe
