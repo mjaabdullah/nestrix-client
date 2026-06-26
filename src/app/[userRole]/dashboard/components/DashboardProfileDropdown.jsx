@@ -3,6 +3,7 @@
 import { ArrowRightFromSquare, Gear, Person } from "@gravity-ui/icons";
 import { AnimatePresence, motion } from "framer-motion";
 import Image from "next/image";
+import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { ROLE_COLORS, ROLE_LABELS } from "./DashboardMenus ";
 
@@ -94,14 +95,16 @@ export default function DashboardProfileDropdown({ user, onLogout }) {
 
             {/* Menu items */}
             <div className="py-1">
-              <button className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-foreground hover:bg-accent/5 transition-colors duration-150 text-left">
-                <Person
-                  width={15}
-                  height={15}
-                  className="text-muted-foreground"
-                />
-                View Profile
-              </button>
+              <Link href={`/${user?.role}/dashboard/profile`}>
+                <button className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-foreground hover:bg-accent/5 transition-colors duration-150 text-left">
+                  <Person
+                    width={15}
+                    height={15}
+                    className="text-muted-foreground"
+                  />
+                  View Profile
+                </button>
+              </Link>
               <button className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-foreground hover:bg-accent/5 transition-colors duration-150 text-left">
                 <Gear
                   width={15}

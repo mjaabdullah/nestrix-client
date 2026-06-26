@@ -8,7 +8,6 @@ import { DASHBOARD_MENUS } from "./DashboardMenus ";
 export default function DashboardMenu({ role, collapsed = false }) {
   const pathname = usePathname();
   const menuItems = DASHBOARD_MENUS[role] || [];
-  console.log(pathname, "path");
 
   const isActive = (href) => {
     if (href === pathname) return true;

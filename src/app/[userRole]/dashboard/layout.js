@@ -8,6 +8,7 @@ import DashboardFooter from "./components/DashboardFooter";
 import DashboardMobileDrawer from "./components/DashboardMobileDrawer";
 import DashboardNavbar from "./components/DashboardNavbar";
 import DashboardSidebar from "./components/DashboardSidebar";
+import LoadingState from "./components/LoadingState";
 
 // ---------------------------------------------------------------------------
 // Hook: detect tablet breakpoint
@@ -41,8 +42,11 @@ export default function DashboardLayout({ children }) {
   }, [pathname]);
 
   const handleLogout = async () => {
-    await authClient.signOut();
+    const res = await authClient.signOut();
     router.push("/login");
+    if (!res?.error) {
+      return <LoadingState />;
+    }
   };
 
   // Sidebar is collapsed on tablet, hidden on mobile (drawer takes over)
