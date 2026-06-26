@@ -1,6 +1,7 @@
 const DashBoardPage = async ({ params }) => {
   const { userRole } = await params;
   console.log(userRole);
+
   return (
     <div className="bg-accent-soft-foreground h-10 text-accent">
       {userRole} active in the dashboard
