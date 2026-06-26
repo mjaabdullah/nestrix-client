@@ -19,7 +19,6 @@ const NavBar = () => {
 
   const handleLogOut = async () => {
     await authClient.signOut();
-
     router.push("/login");
   };
 

@@ -1,5 +1,4 @@
-import Footer from "@/components/shared/Footer";
-import NavBar from "@/components/shared/NavBar";
+import ClientLayout from "@/components/ClientLayout";
 import { Toast } from "@heroui/react";
 import { Geist_Mono } from "next/font/google";
 import "./globals.css";
@@ -24,9 +23,7 @@ export default function RootLayout({ children }) {
     >
       <body className="min-h-full flex flex-col">
         <Toast.Provider />
-        <NavBar />
-        {children}
-        <Footer />
+        <ClientLayout>{children}</ClientLayout>
       </body>
     </html>
   );
