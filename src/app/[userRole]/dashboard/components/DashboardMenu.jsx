@@ -8,13 +8,14 @@ import { DASHBOARD_MENUS } from "./DashboardMenus ";
 export default function DashboardMenu({ role, collapsed = false }) {
   const pathname = usePathname();
   const menuItems = DASHBOARD_MENUS[role] || [];
+  console.log(pathname, "path");
 
   const isActive = (href) => {
-    if (href === "/dashboard") {
-      return pathname === "/dashboard";
-    }
-    return pathname.startsWith(href);
+    if (href === pathname) return true;
+
+    return false;
   };
+
 
   return (
     <nav className="flex flex-col gap-0.5 py-2" aria-label="Main navigation">

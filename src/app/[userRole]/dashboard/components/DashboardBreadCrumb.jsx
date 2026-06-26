@@ -18,7 +18,7 @@ export default function DashboardBreadcrumb() {
     }));
 
   return (
-    <nav aria-label="Breadcrumb" className="flex items-center gap-1">
+    <nav aria-label="Breadcrumb" className="hidden md:flex items-center gap-1">
       {segments.map((seg, idx) => (
         <span key={seg.href} className="flex items-center gap-1">
           {idx > 0 && (
