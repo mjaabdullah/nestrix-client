@@ -1,7 +1,9 @@
 "use client";
 
+import { useSession } from "@/lib/auth-client";
+import { saveToFavorites } from "@/lib/core/property";
 import { Heart, MapPin, Star } from "@gravity-ui/icons";
-import { Button } from "@heroui/react";
+import { Button, toast } from "@heroui/react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -105,15 +107,32 @@ export default function PropertyCard({
   //
   const property = normalizeProperty(rawProperty);
 
+  const { data: session } = useSession();
+  const user = session?.user;
+
   const router = useRouter();
   const [isFavorited, setIsFavorited] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const [imgError, setImgError] = useState(false);
 
-  function handleFavorite(e) {
+  const handleFavorite = async (e) => {
     e?.stopPropagation();
-    setIsFavorited((prev) => !prev);
-  }
+
+    if (!user) router.push("/login");
+
+    const favorite = {
+      userId: user.id,
+      propertyId: property.id,
+    };
+    const res = await saveToFavorites(favorite);
+    if (!res.insertedId) {
+      toast.warning(res.message);
+    }
+    if (res.insertedId) {
+      toast.success("Added to favorites");
+      setIsFavorited((prev) => !prev);
+    }
+  };
 
   // ─── Fallback image ──────────────────────────────────────────────────────
   const imageSrc =

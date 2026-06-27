@@ -129,7 +129,7 @@ const UsersTable = ({
                         value={user.role}
                         onChange={(e) => onRoleSelect(user._id, e.target.value)}
                         isDisabled={user?.role === "admin"}
-                        className="w-23"
+                        className="w-28"
                       >
                         <Select.Trigger className="border border-border bg-background  text-xs text-foreground rounded-lg px-2">
                           <Select.Value className="text-xs text-foreground" />
@@ -145,7 +145,7 @@ const UsersTable = ({
                                 textValue={
                                   r.charAt(0).toUpperCase() + r.slice(1)
                                 }
-                                className="text-foreground data-[focused=true]:bg-muted px-2 py-1.5 text-xs cursor-pointer"
+                                className="text-foreground data-[focused=true]:bg-muted px-2 py-1.5 text-xs cursor-pointer flex justify-between items-center"
                               >
                                 <RoleBadge role={r} />
                                 <ListBox.ItemIndicator />
