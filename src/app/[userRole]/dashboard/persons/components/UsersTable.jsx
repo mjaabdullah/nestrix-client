@@ -128,10 +128,10 @@ const UsersTable = ({
                         aria-label="Change role"
                         value={user.role}
                         onChange={(e) => onRoleSelect(user._id, e.target.value)}
-                        isDisabled={!!updatingId}
-                        className="w-28"
+                        isDisabled={user?.role === "admin"}
+                        className="w-23"
                       >
-                        <Select.Trigger className="border border-border bg-background h-8 min-h-8 text-xs text-foreground rounded-lg px-2">
+                        <Select.Trigger className="border border-border bg-background  text-xs text-foreground rounded-lg px-2">
                           <Select.Value className="text-xs text-foreground" />
                           <Select.Indicator />
                         </Select.Trigger>

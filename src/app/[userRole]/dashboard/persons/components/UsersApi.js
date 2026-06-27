@@ -1,3 +1,5 @@
+import { authClient } from "@/lib/auth-client";
+import { url } from "@/lib/core/property";
 import { House, Person, ShieldCheck } from "@gravity-ui/icons";
 
 // ─── Constants ────────────────────────────────────────────────────────────────
@@ -37,77 +39,82 @@ export const formatDate = (iso) => {
 
 // ─── API: Fetch all users ─────────────────────────────────────────────────────
 //
-// export const fetchUsers = async () => {
-//   const res = await fetch("/api/users");
-//   if (!res.ok) throw new Error("Failed to fetch users");
-//   return res.json();
-// };
+export const fetchUsers = async () => {
+  const { data: session } = await authClient.token();
+  const res = await fetch(`${url}/api/persons`, {
+    headers: {
+      authorization: `Bearer ${session?.token}`,
+    },
+  });
 
-export const fetchUsers = () =>
-  new Promise((resolve) =>
-    setTimeout(
-      () =>
-        resolve([
-          {
-            _id: "1",
-            name: "Arif Hossain",
-            email: "arif@nestrix.com",
-            photo: "https://i.pravatar.cc/150?img=11",
-            role: "admin",
-            createdAt: "2024-01-15T08:30:00Z",
-          },
-          {
-            _id: "2",
-            name: "Sadia Islam",
-            email: "sadia@gmail.com",
-            photo: "https://i.pravatar.cc/150?img=47",
-            role: "owner",
-            createdAt: "2024-03-22T14:10:00Z",
-          },
-          {
-            _id: "3",
-            name: "Tanvir Alam",
-            email: "tanvir@gmail.com",
-            photo: "",
-            role: "tenant",
-            createdAt: "2024-05-03T09:45:00Z",
-          },
-          {
-            _id: "4",
-            name: "Nusrat Jahan",
-            email: "nusrat@yahoo.com",
-            photo: "https://i.pravatar.cc/150?img=31",
-            role: "tenant",
-            createdAt: "2024-06-18T11:00:00Z",
-          },
-          {
-            _id: "5",
-            name: "Rahim Uddin",
-            email: "rahim@nestrix.com",
-            photo: "https://i.pravatar.cc/150?img=15",
-            role: "owner",
-            createdAt: "2024-07-30T16:20:00Z",
-          },
-          {
-            _id: "6",
-            name: "Mitu Begum",
-            email: "mitu@gmail.com",
-            photo: "",
-            role: "tenant",
-            createdAt: "2024-08-05T10:10:00Z",
-          },
-          {
-            _id: "7",
-            name: "Fahad Khan",
-            email: "fahad@nestrix.com",
-            photo: "https://i.pravatar.cc/150?img=53",
-            role: "admin",
-            createdAt: "2024-09-12T13:55:00Z",
-          },
-        ]),
-      1200,
-    ),
-  );
+  return res.json();
+};
+
+// export const fetchUsers = () =>
+//   new Promise((resolve) =>
+//     setTimeout(
+//       () =>
+//         resolve([
+//           {
+//             _id: "1",
+//             name: "Arif Hossain",
+//             email: "arif@nestrix.com",
+//             photo: "https://i.pravatar.cc/150?img=11",
+//             role: "admin",
+//             createdAt: "2024-01-15T08:30:00Z",
+//           },
+//           {
+//             _id: "2",
+//             name: "Sadia Islam",
+//             email: "sadia@gmail.com",
+//             photo: "https://i.pravatar.cc/150?img=47",
+//             role: "owner",
+//             createdAt: "2024-03-22T14:10:00Z",
+//           },
+//           {
+//             _id: "3",
+//             name: "Tanvir Alam",
+//             email: "tanvir@gmail.com",
+//             photo: "",
+//             role: "tenant",
+//             createdAt: "2024-05-03T09:45:00Z",
+//           },
+//           {
+//             _id: "4",
+//             name: "Nusrat Jahan",
+//             email: "nusrat@yahoo.com",
+//             photo: "https://i.pravatar.cc/150?img=31",
+//             role: "tenant",
+//             createdAt: "2024-06-18T11:00:00Z",
+//           },
+//           {
+//             _id: "5",
+//             name: "Rahim Uddin",
+//             email: "rahim@nestrix.com",
+//             photo: "https://i.pravatar.cc/150?img=15",
+//             role: "owner",
+//             createdAt: "2024-07-30T16:20:00Z",
+//           },
+//           {
+//             _id: "6",
+//             name: "Mitu Begum",
+//             email: "mitu@gmail.com",
+//             photo: "",
+//             role: "tenant",
+//             createdAt: "2024-08-05T10:10:00Z",
+//           },
+//           {
+//             _id: "7",
+//             name: "Fahad Khan",
+//             email: "fahad@nestrix.com",
+//             photo: "https://i.pravatar.cc/150?img=53",
+//             role: "admin",
+//             createdAt: "2024-09-12T13:55:00Z",
+//           },
+//         ]),
+//       1200,
+//     ),
+//   );
 
 // ─── API: Update a user's role ────────────────────────────────────────────────
 // export const patchUserRole = async (userId, newRole) => {

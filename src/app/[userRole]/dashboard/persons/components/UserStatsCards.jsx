@@ -14,7 +14,7 @@ const STAT_ITEMS = [
     label: "Admins",
     icon: <ShieldCheck width={16} height={16} />,
     cardClass: "bg-accent/10 border-accent/30",
-    textClass: "text-accent-foreground",
+    textClass: "text-accent",
   },
   {
     key: "owner",

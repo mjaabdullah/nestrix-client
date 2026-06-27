@@ -40,16 +40,22 @@ const AllUsersPage = () => {
     const load = async () => {
       setLoading(true);
       try {
-        const data = await fetchUsers();
-        setUsers(data);
+        const userData = await fetchUsers();
+        if (userData?.success) {
+          setUsers(userData?.data);
+          setLoading(false);
+        }
       } catch {
         toast.warning("Failed to load users");
       } finally {
-        setLoading(false);
+        if (userData?.success) {
+          setLoading(false);
+        }
       }
     };
     load();
   }, []);
+
 
   // ── Derived: filtered list + pagination ──────────────────────────────────
   const filtered = useMemo(() => {
