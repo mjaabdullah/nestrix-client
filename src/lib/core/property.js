@@ -23,3 +23,18 @@ export const saveToFavorites = async (favorite) => {
 
   return res.json();
 };
+
+
+export const removeFromFavorites = async (favorite) => {
+  const { data: session } = await authClient.token();
+  const res = await fetch(`${url}/api/remove-from-favorite`, {
+    method: "DELETE",
+    headers: {
+      "Content-Type": "application/json",
+      authorization: `Bearer ${session?.token}`,
+    },
+    body: JSON.stringify(favorite),
+  });
+
+  return res.json();
+};

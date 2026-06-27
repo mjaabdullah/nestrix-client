@@ -1,7 +1,7 @@
 "use client";
 
 import { useSession } from "@/lib/auth-client";
-import { saveToFavorites } from "@/lib/core/property";
+import { removeFromFavorites, saveToFavorites } from "@/lib/core/property";
 import { Heart, MapPin, Star } from "@gravity-ui/icons";
 import { Button, toast } from "@heroui/react";
 import { motion } from "framer-motion";
@@ -124,13 +124,27 @@ export default function PropertyCard({
       userId: user.id,
       propertyId: property.id,
     };
-    const res = await saveToFavorites(favorite);
-    if (!res.insertedId) {
-      toast.warning(res.message);
+
+    if (isFavorited) {
+      const res = await removeFromFavorites(favorite);
+
+      if (!res.success) {
+        toast.warning(res.message);
+      }
+      if (res.success) {
+        toast.success(res.message);
+        setIsFavorited(!isFavorited);
+      }
     }
-    if (res.insertedId) {
-      toast.success("Added to favorites");
-      setIsFavorited((prev) => !prev);
+    if (!isFavorited) {
+      const res = await saveToFavorites(favorite);
+      if (!res.insertedId) {
+        toast.warning(res.message);
+      }
+      if (res.insertedId) {
+        toast.success("Added to favorites");
+        setIsFavorited(!isFavorited);
+      }
     }
   };
 
