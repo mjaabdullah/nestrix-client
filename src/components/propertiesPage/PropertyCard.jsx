@@ -1,13 +1,18 @@
 "use client";
 
+import LoadingState from "@/app/[userRole]/dashboard/components/LoadingState";
 import { useSession } from "@/lib/auth-client";
-import { removeFromFavorites, saveToFavorites } from "@/lib/core/property";
+import {
+  getFavorites,
+  removeFromFavorites,
+  saveToFavorites,
+} from "@/lib/core/property";
 import { Heart, MapPin, Star } from "@gravity-ui/icons";
 import { Button, toast } from "@heroui/react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { BiArea, BiBath, BiBed } from "react-icons/bi";
 import { TbBuildingEstate } from "react-icons/tb";
 
@@ -101,7 +106,7 @@ function StatusBadge({ status = "Approved" }) {
 // ─── PropertyCard
 export default function PropertyCard({
   property: rawProperty,
-  isLoggedIn = false,
+
   animate = true,
 }) {
   //
@@ -111,9 +116,36 @@ export default function PropertyCard({
   const user = session?.user;
 
   const router = useRouter();
-  const [isFavorited, setIsFavorited] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+
   const [isHovered, setIsHovered] = useState(false);
   const [imgError, setImgError] = useState(false);
+  const [isFavorited, setIsFavorited] = useState(false);
+  useEffect(() => {
+    if (!user || !property) {
+      setIsLoading(false);
+      return;
+    }
+
+    const loadFavorite = async () => {
+      try {
+        const favorites = await getFavorites({
+          userId: user.id,
+          propertyId: property.id,
+        });
+
+        const alreadyFavorited = await favorites?.isFavorite;
+
+        setIsFavorited(alreadyFavorited);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadFavorite();
+  }, [user, property, isFavorited]);
 
   const handleFavorite = async (e) => {
     e?.stopPropagation();
@@ -325,7 +357,7 @@ export default function PropertyCard({
         className="group flex flex-col bg-secondary border border-border rounded-[8px] overflow-hidden"
         style={{ willChange: "transform" }}
       >
-        {cardContent}
+        {isLoading ? <LoadingState /> : cardContent}
       </motion.article>
     );
   }

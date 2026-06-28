@@ -10,6 +10,22 @@ export const getFeaturedProperties = () => {
   return properties;
 };
 
+
+
+export const getFavorites = async (favorite) => {
+  const { data: session } = await authClient.token();
+  const res = await fetch(
+    `${url}/api/favorites?userId=${favorite.userId}&propertyId=${favorite.propertyId}`,
+    {
+      method: "GET",
+      headers: {
+        authorization: `Bearer ${session?.token}`,
+      },
+    },
+  );
+  return res.json();
+};
+
 export const saveToFavorites = async (favorite) => {
   const { data: session } = await authClient.token();
   const res = await fetch(`${url}/api/add-to-favorite`, {
