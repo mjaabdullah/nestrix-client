@@ -41,7 +41,7 @@ const ReviewCard = ({ review }) => {
           <Stars rating={review.rating} />
         </div>
       </div>
-      <p className="text-sm text-muted-foreground leading-relaxed">
+      <p className="text-sm text-muted-foreground leading-relaxed line-clamp-3">
         {review.comment}
       </p>
     </div>

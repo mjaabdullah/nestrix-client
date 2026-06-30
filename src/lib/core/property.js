@@ -68,3 +68,9 @@ export const removeFromFavorites = async (favorite) => {
 
   return res.json();
 };
+
+
+export const getTopReviews = async () => {
+  const res = await fetch(`${url}/api/top-reviews`);
+  return res.json();
+};
