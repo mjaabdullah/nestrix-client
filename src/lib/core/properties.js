@@ -19,3 +19,10 @@ export const getProperties = async (location, type, page, min, max) => {
 
   return res.json();
 };
+export const getPropertyTypes = async () => {
+  const res = await fetch(`${url}/api/properties/types`, {
+    cache: "no-store",
+  });
+
+  return res.json();
+};

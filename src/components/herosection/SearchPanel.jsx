@@ -1,9 +1,10 @@
 "use client";
 
+import { getPropertyTypes } from "@/lib/core/properties";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FiMapPin, FiSearch } from "react-icons/fi";
 const SearchPanel = () => {
   const router = useRouter();
@@ -11,6 +12,18 @@ const SearchPanel = () => {
   const [propType, setPropType] = useState("");
   const [minPrice, setMinPrice] = useState("");
   const [maxPrice, setMaxPrice] = useState("");
+  const [propertyTypes, setPropertyTypes] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const loadPropertyTypes = async () => {
+      const res = await getPropertyTypes();
+      setPropertyTypes(res);
+      setIsLoading(false);
+    };
+
+    loadPropertyTypes();
+  }, []);
 
   const handleSearch = () => {
     const searchData = {
@@ -80,12 +93,17 @@ const SearchPanel = () => {
               }}
             >
               <option value="">Any type</option>
-              <option value="duplex">Duplex</option>
+              {propertyTypes.map((type) => (
+                <option key={type} value={type.toLowerCase()}>
+                  {type}
+                </option>
+              ))}
+              {/* <option value="duplex">Duplex</option>
               <option value="apartment">Apartment</option>
               <option value="house">House</option>
               <option value="studio">Studio</option>
               <option value="villa">Villa</option>
-              <option value="penthouse">Penthouse</option>
+              <option value="penthouse">Penthouse</option> */}
             </select>
           </div>
 
