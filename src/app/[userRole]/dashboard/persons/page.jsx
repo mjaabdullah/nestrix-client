@@ -5,6 +5,7 @@ import { useEffect, useMemo, useState } from "react";
 import { FiSearch } from "react-icons/fi";
 import { MdAdminPanelSettings } from "react-icons/md";
 
+import { useSession } from "@/lib/auth-client";
 import AccessDenied from "./components/AccessDenied";
 import RoleChangeConfirmModal from "./components/RoleChangeConfirmModal";
 import UserStatsCards from "./components/UserStatsCards";
@@ -20,7 +21,10 @@ import UsersTableToolbar from "./components/UsersTableToolbar";
 const MOCK_CURRENT_USER = { role: "admin" };
 
 const AllUsersPage = () => {
-  const currentUser = MOCK_CURRENT_USER;
+  const { data: session } = useSession();
+  const user = session?.user;
+
+  const currentUser = user || MOCK_CURRENT_USER;
 
   // ── State ────────────────────────────────────────────────────────────────
   const [users, setUsers] = useState([]);
@@ -55,7 +59,6 @@ const AllUsersPage = () => {
     };
     load();
   }, []);
-
 
   // ── Derived: filtered list + pagination ──────────────────────────────────
   const filtered = useMemo(() => {

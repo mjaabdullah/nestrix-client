@@ -127,7 +127,7 @@ const UsersTable = ({
                       <Select
                         aria-label="Change role"
                         value={user.role}
-                        onChange={(e) => onRoleSelect(user._id, e.target.value)}
+                        onChange={(newRole) => onRoleSelect(user._id, newRole)}
                         isDisabled={user?.role === "admin"}
                         className="w-28"
                       >
