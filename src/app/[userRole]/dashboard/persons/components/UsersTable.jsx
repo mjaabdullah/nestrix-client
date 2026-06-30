@@ -138,7 +138,9 @@ const UsersTable = ({
 
                         <Select.Popover className="bg-background border border-border rounded-lg">
                           <ListBox>
-                            {ROLES.map((r) => (
+                            {ROLES.filter(
+                              (r) => user.role === "admin" || r !== "admin",
+                            ).map((r) => (
                               <ListBox.Item
                                 key={r}
                                 id={r}

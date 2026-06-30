@@ -26,6 +26,20 @@ export const getFavorites = async (favorite) => {
   return res.json();
 };
 
+
+
+export const getFavoritesByUser = async (userId) => {
+  const { data: session } = await authClient.token();
+  const res = await fetch(`${url}/api/favorites-by-user?userId=${userId}`, {
+    method: "GET",
+    headers: {
+      authorization: `Bearer ${session?.token}`,
+    },
+  });
+  return res.json();
+};
+
+
 export const saveToFavorites = async (favorite) => {
   const { data: session } = await authClient.token();
   const res = await fetch(`${url}/api/add-to-favorite`, {

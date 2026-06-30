@@ -33,13 +33,15 @@ export default function DashboardProfileDropdown({ user, onLogout }) {
         {/* Avatar */}
         <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center flex-shrink-0">
           <span className="text-primary-foreground  text-xs font-semibold">
-            <Image
-              className="rounded-full"
-              src={user?.image}
-              width={100}
-              height={100}
-              alt={user?.name}
-            />
+            {user?.image && (
+              <Image
+                className="rounded-full"
+                src={user?.image}
+                width={100}
+                height={100}
+                alt={user?.name}
+              />
+            )}
           </span>
         </div>
         <div className="hidden sm:flex flex-col items-start leading-none">
