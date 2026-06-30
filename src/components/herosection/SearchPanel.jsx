@@ -98,12 +98,6 @@ const SearchPanel = () => {
                   {type}
                 </option>
               ))}
-              {/* <option value="duplex">Duplex</option>
-              <option value="apartment">Apartment</option>
-              <option value="house">House</option>
-              <option value="studio">Studio</option>
-              <option value="villa">Villa</option>
-              <option value="penthouse">Penthouse</option> */}
             </select>
           </div>
 

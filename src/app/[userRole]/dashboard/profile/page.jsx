@@ -11,19 +11,7 @@ import {
 } from "react-icons/ri";
 import LoadingState from "../components/LoadingState";
 
-// ─── Static dummy data ─────────────────────────────────────────────────────────
-// const user = {
-//   name: "Arif Hossain",
-//   email: "arif.hossain@email.com",
-//   phone: "+880 1712 345678",
-//   role: "Owner", // "Tenant" | "Owner" | "Admin"
-//   location: "Dhaka, Bangladesh",
-//   memberSince: "January 12, 2023",
-//   avatar: "https://i.pravatar.cc/300?img=12",
-//   totalListings: 8,
-//   totalBookings: 24,
-//   rating: 4.9,
-// };
+
 
 // ─── Role badge config ─────────────────────────────────────────────────────────
 const roleBadge = {

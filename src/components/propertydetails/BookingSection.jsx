@@ -1,16 +1,41 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-const BookingSection = ({ property }) => {
-  const [loading, setLoading] = useState(false);
+const BookingSection = ({ property, user }) => {
+  const router = useRouter();
+  const [isOpen, setIsOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState(null);
 
-  const handleBook = async () => {
-    setLoading(true);
-    // TODO: navigate to booking page or open modal
-    // e.g. router.push(`/booking/${property._id}`)
-    await new Promise((r) => setTimeout(r, 800)); // placeholder
-    setLoading(false);
+  const handleConfirmBooking = async (formData) => {
+    setIsSubmitting(true);
+    setError(null);
+
+    try {
+      const response = await fetch("/api/bookings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ...formData,
+          userId: user?._id,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Booking failed. Please try again.");
+      }
+
+      const booking = await response.json();
+
+      setIsOpen(false);
+      router.push(`/payment/${booking._id}`);
+    } catch (err) {
+      setError(err.message || "Something went wrong. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -46,14 +71,30 @@ const BookingSection = ({ property }) => {
         ))}
       </div>
 
+      {error && (
+        <p className="text-xs text-foreground mb-3" role="alert">
+          {error}
+        </p>
+      )}
+
       {/* Book button */}
       <button
-        onClick={handleBook}
-        disabled={loading}
+        onClick={() => setIsOpen(true)}
+        disabled={isSubmitting}
+        aria-label="Book this property"
         className="w-full bg-primary text-primary-foreground text-sm font-medium py-3 rounded-sm hover:opacity-90 active:scale-[0.98] transition-all duration-150 disabled:opacity-60 disabled:cursor-not-allowed"
       >
-        {loading ? "Please wait..." : "Book Property"}
+        {isSubmitting ? "Please wait..." : "Book Property"}
       </button>
+
+      {/* <BookingModal
+        isOpen={isOpen}
+        onOpenChange={setIsOpen}
+        property={property}
+        user={user}
+        onConfirmBooking={handleConfirmBooking}
+        isSubmitting={isSubmitting}
+      /> */}
     </div>
   );
 };

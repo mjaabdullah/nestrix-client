@@ -6,76 +6,18 @@ import ReviewsSection from "@/components/propertydetails/ReviewsSection";
 import { getReviewsByPropertyId } from "@/lib/core/reviews";
 import { getPropertyById } from "@/lib/getproperty";
 
-async function getProperty(id) {
+
+export async function generateMetadata({ params }) {
+  const { id } = await params;
+
+  const property = await getPropertyById(id);
+
   return {
-    _id: id,
-    title: "Modern Family Apartment in Gulshan",
-    description:
-      "Experience refined urban living in this thoughtfully designed family apartment nestled in Gulshan's most sought-after address. The residence seamlessly blends contemporary architecture with functional elegance — featuring expansive living areas bathed in natural light, a gourmet kitchen outfitted with premium fittings, and three generously proportioned bedrooms.",
-    location: "Gulshan, Dhaka",
-    propertyType: "Apartment",
-    rent: 55000,
-    rentType: "Monthly",
-    bedrooms: 3,
-    bathrooms: 3,
-    propertySize: "1650 sq ft",
-    amenities: [
-      "WiFi",
-      "Parking",
-      "Security",
-      "Elevator",
-      "Generator Backup",
-      "Air Conditioning",
-    ],
-    extraFeatures: ["Fully Furnished", "School Nearby", "Shopping Mall Nearby"],
-    status: "Approved",
-    featured: true,
-    averageRating: 4.8,
-    totalReviews: 184,
-    owner: {
-      ownerId: "owner_001",
-      name: "Arif Hossain",
-      email: "arif@nestrix-owner.com",
-    },
+    title: property.title,
+    description: property.description,
   };
 }
 
-async function getReviews(propertyId) {
-  return [
-    {
-      _id: "r1",
-      name: "Nadia Rahman",
-      date: "March 2025",
-      rating: 5,
-      comment:
-        "Absolutely stunning apartment. The finishes are impeccable and the Gulshan location is unbeatable. Highly recommend to anyone seeking premium Dhaka living.",
-    },
-    {
-      _id: "r2",
-      name: "Tanvir Islam",
-      date: "February 2025",
-      rating: 5,
-      comment:
-        "The generator backup and 24/7 security gave us complete peace of mind. Spacious layout, excellent natural lighting. Move-in was seamless.",
-    },
-    {
-      _id: "r3",
-      name: "Sadia Akter",
-      date: "January 2025",
-      rating: 4,
-      comment:
-        "Very well-maintained property with modern amenities. Minor maintenance requests were resolved within 24 hours.",
-    },
-    {
-      _id: "r4",
-      name: "Kabir Hasan",
-      date: "December 2024",
-      rating: 5,
-      comment:
-        "Exceptional value for a Gulshan address. Fully furnished so we could move in immediately. Building management is professional.",
-    },
-  ];
-}
 
 const PropertyDetailsPage = async ({ params }) => {
   const { id } = await params;

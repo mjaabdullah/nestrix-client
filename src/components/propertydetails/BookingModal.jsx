@@ -41,11 +41,7 @@ function formatCurrency(value) {
   if (value === undefined || value === null || value === "") return "—";
   const numeric = Number(value);
   if (Number.isNaN(numeric)) return "—";
-  return numeric.toLocaleString(undefined, {
-    style: "currency",
-    currency: "USD",
-    maximumFractionDigits: 0,
-  });
+  return `৳${numeric.toLocaleString()}`;
 }
 
 export default function BookingModal({
@@ -63,13 +59,14 @@ export default function BookingModal({
 
   const minDate = today(getLocalTimeZone());
 
-  const rentAmount = property?.rentAmount;
+  const rentAmount = property?.rent;
+  const rentType = property?.rentType || "month";
   const bookingFee = property?.bookingFee;
   const totalPayable =
     property?.totalPayable !== undefined && property?.totalPayable !== null
       ? property.totalPayable
-      : rentAmount !== undefined && bookingFee !== undefined
-        ? Number(rentAmount) + Number(bookingFee)
+      : rentAmount !== undefined
+        ? Number(rentAmount) + Number(bookingFee || 0)
         : undefined;
 
   const propertyImage = property?.image || property?.images?.[0];
@@ -105,7 +102,7 @@ export default function BookingModal({
     if (!validate()) return;
 
     onConfirmBooking({
-      propertyId: property?.id,
+      propertyId: property?._id,
       moveInDate: moveInDate ? moveInDate.toString() : null,
       contactNumber: contactNumber.trim(),
       notes: notes.trim(),
@@ -186,7 +183,10 @@ export default function BookingModal({
                     </span>
                     <span className="font-medium text-foreground">
                       {formatCurrency(rentAmount)}
-                      <span className="text-muted-foreground"> / month</span>
+                      <span className="text-muted-foreground">
+                        {" "}
+                        / {rentType}
+                      </span>
                     </span>
                   </div>
                 </div>
@@ -265,7 +265,7 @@ export default function BookingModal({
                 <div className="flex flex-col gap-1">
                   <Input
                     label="Contact Number"
-                    placeholder="e.g. +1 555 123 4567"
+                    placeholder="e.g. +880 1XXX-XXXXXX"
                     value={contactNumber}
                     onValueChange={setContactNumber}
                     isRequired

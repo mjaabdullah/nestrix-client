@@ -4,6 +4,7 @@ import { getProperties } from "@/lib/core/properties";
 import { Suspense } from "react";
 import { RiMapPinLine, RiPhoneLine, RiStarLine } from "react-icons/ri";
 
+
 const PropertiesPage = async ({ searchParams }) => {
   const params = await searchParams;
   const location = (await params?.location) || "";
