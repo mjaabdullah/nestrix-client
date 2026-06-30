@@ -607,7 +607,7 @@ const HeroSection = () => {
               initial="hidden"
               animate="visible"
               custom={5}
-              className="mt-12 pt-10 border-t border-border grid grid-cols-3 gap-6"
+              className="mt-12 pt-10 border-t border-border grid grid-cols-1 sm:grid-cols-3 gap-6"
             >
               {stats.map(({ value, suffix, label }, i) => (
                 <div key={label}>
