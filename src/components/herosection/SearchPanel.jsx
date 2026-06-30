@@ -1,23 +1,35 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { useRouter } from "next/navigation";
+
 import { useState } from "react";
 import { FiMapPin, FiSearch } from "react-icons/fi";
 const SearchPanel = () => {
+  const router = useRouter();
   const [locationVal, setLocationVal] = useState("");
   const [propType, setPropType] = useState("");
   const [minPrice, setMinPrice] = useState("");
   const [maxPrice, setMaxPrice] = useState("");
+
   const handleSearch = () => {
     const searchData = {
       location: locationVal,
-      propertyType: propType,
-      minPrice: minPrice,
-      maxPrice: maxPrice,
+      type: propType,
+      min: minPrice,
+      max: maxPrice,
     };
+    const queryParams = new URLSearchParams();
 
-    // TODO: search logic
-    console.log(searchData, "search");
+    Object.entries(searchData).forEach(([key, value]) => {
+      if (value !== undefined && value !== null && value !== "") {
+        queryParams.append(key, value);
+      }
+    });
+
+    const queryString = queryParams.toString();
+
+    router.push(`/properties?${queryString}`);
   };
   return (
     <motion.div
@@ -68,6 +80,7 @@ const SearchPanel = () => {
               }}
             >
               <option value="">Any type</option>
+              <option value="duplex">Duplex</option>
               <option value="apartment">Apartment</option>
               <option value="house">House</option>
               <option value="studio">Studio</option>
@@ -107,7 +120,7 @@ const SearchPanel = () => {
           </div>
 
           {/* Search button */}
-          <div onclick={handleSearch} className="flex flex-col gap-1 lg:pb-0">
+          <div onClick={handleSearch} className="flex flex-col gap-1 lg:pb-0">
             <span className="text-[11px] text-transparent uppercase tracking-widest px-1 hidden lg:block select-none">
               &nbsp;
             </span>

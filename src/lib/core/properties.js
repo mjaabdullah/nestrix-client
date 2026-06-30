@@ -1,12 +1,6 @@
 import { url } from "./property";
 
-export const getProperties = async (
-  location,
-  type,
-  page,
-  minPrice,
-  maxPrice,
-) => {
+export const getProperties = async (location, type, page, min, max) => {
   const params = new URLSearchParams();
 
   if (page) params.append("page", page);
@@ -14,9 +8,9 @@ export const getProperties = async (
   if (location) params.append("location", location);
   if (type) params.append("propertyType", type);
 
-  if (minPrice !== undefined) params.append("minPrice", minPrice);
+  if (min !== undefined) params.append("minPrice", min);
 
-  if (maxPrice !== undefined) params.append("maxPrice", maxPrice);
+  if (max !== undefined) params.append("maxPrice", max);
   const filter = params.toString();
 
   const res = await fetch(`${url}/api/properties?${filter}`, {
