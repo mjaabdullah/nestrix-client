@@ -3,23 +3,31 @@
 import { CreditCard, House, MapPin } from "@gravity-ui/icons";
 import {
   Button,
+  Calendar,
+  DateField,
   DatePicker,
+  Description,
+  FieldError,
   Input,
+  InputGroup,
+  Label,
   Modal,
-  ModalBody,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  Textarea,
+  Radio,
+  RadioGroup,
+  Spinner,
+  TextArea,
+  TextField,
 } from "@heroui/react";
 import { getLocalTimeZone, today } from "@internationalized/date";
 import { motion } from "framer-motion";
 import { useState } from "react";
 import {
   FiAlertCircle,
+  FiCheckCircle,
   FiFileText,
   FiMail,
   FiPhone,
+  FiSmartphone,
   FiUser,
 } from "react-icons/fi";
 
@@ -37,6 +45,24 @@ const itemVariants = {
   visible: { opacity: 1, y: 0, transition: { duration: 0.3, ease: "easeOut" } },
 };
 
+const PAYMENT_METHODS = [
+  {
+    id: "bkash",
+    label: "bKash",
+    description: "Pay instantly with your bKash wallet",
+  },
+  {
+    id: "nagad",
+    label: "Nagad",
+    description: "Pay instantly with your Nagad wallet",
+  },
+  {
+    id: "card",
+    label: "Debit / Credit Card",
+    description: "Visa, Mastercard, or local cards",
+  },
+];
+
 function formatCurrency(value) {
   if (value === undefined || value === null || value === "") return "—";
   const numeric = Number(value);
@@ -45,16 +71,19 @@ function formatCurrency(value) {
 }
 
 export default function BookingModal({
-  isOpen,
-  onOpenChange,
+  state,
   property,
   user,
   onConfirmBooking,
   isSubmitting,
 }) {
+  // step: "details" -> "payment" -> "success"
+  const [step, setStep] = useState("details");
   const [moveInDate, setMoveInDate] = useState(null);
   const [contactNumber, setContactNumber] = useState("");
   const [notes, setNotes] = useState("");
+  // Default payment method is "card"
+  const [paymentMethod, setPaymentMethod] = useState("card");
   const [errors, setErrors] = useState({});
 
   const minDate = today(getLocalTimeZone());
@@ -72,20 +101,21 @@ export default function BookingModal({
   const propertyImage = property?.image || property?.images?.[0];
 
   function resetForm() {
+    setStep("details");
     setMoveInDate(null);
     setContactNumber("");
     setNotes("");
+    setPaymentMethod("card");
     setErrors({});
   }
 
-  function handleOpenChange(open) {
-    if (!open && !isSubmitting) {
-      resetForm();
-    }
-    onOpenChange(open);
+  function handleClose() {
+    if (isSubmitting) return;
+    resetForm();
+    state.close();
   }
 
-  function validate() {
+  function validateDetails() {
     const nextErrors = {};
     if (!moveInDate) {
       nextErrors.moveInDate = "Move-in date is required.";
@@ -97,289 +127,472 @@ export default function BookingModal({
     return Object.keys(nextErrors).length === 0;
   }
 
-  function handleConfirm() {
-    if (isSubmitting) return;
-    if (!validate()) return;
+  function handleContinueToPayment() {
+    if (!validateDetails()) return;
+    setStep("payment");
+  }
 
-    onConfirmBooking({
+  async function handlePayNow() {
+    if (isSubmitting) return;
+
+    await onConfirmBooking({
       propertyId: property?._id,
       moveInDate: moveInDate ? moveInDate.toString() : null,
       contactNumber: contactNumber.trim(),
       notes: notes.trim(),
+      paymentMethod,
       rentAmount,
       bookingFee,
       totalPayable,
     });
+
+    setStep("success");
   }
 
+  const headingCopy = {
+    details: {
+      title: "Booking Property",
+      subtitle: "Complete the information below to continue your reservation.",
+    },
+    payment: {
+      title: "Choose Payment Method",
+      subtitle: "Select how you'd like to pay the total amount below.",
+    },
+    success: {
+      title: "Booking Confirmed",
+      subtitle: "Your reservation has been received.",
+    },
+  }[step];
+
   return (
-    <Modal
-      isOpen={isOpen}
-      onOpenChange={handleOpenChange}
-      isDismissable={!isSubmitting}
-      hideCloseButton={isSubmitting}
-      scrollBehavior="inside"
-      size="2xl"
-      backdrop="blur"
-      classNames={{
-        base: "bg-background border border-border",
-        body: "py-6",
-      }}
-    >
-      <ModalContent>
-        {(onClose) => (
-          <motion.div
-            variants={containerVariants}
-            initial="hidden"
-            animate="visible"
-          >
-            <ModalHeader
-              className="flex flex-col gap-1 border-b border-border"
-              id="booking-modal-title"
+    <Modal state={state}>
+      <Modal.Backdrop
+        isDismissable={!isSubmitting}
+        variant="blur"
+        className="bg-foreground/50"
+      >
+        {/* Constrain the whole dialog to the viewport height so the body can scroll */}
+        <Modal.Container size="2xl" className="max-h-screen">
+          <Modal.Dialog className="flex max-w-150 max-h-screen flex-col border border-border bg-background">
+            <motion.div
+              variants={containerVariants}
+              initial="hidden"
+              animate="visible"
+              className="flex min-h-0 flex-1 flex-col"
             >
-              <span className="text-xl font-semibold text-foreground">
-                Booking Property
-              </span>
-              <span className="text-sm font-normal text-muted-foreground">
-                Complete the information below to continue your reservation.
-              </span>
-            </ModalHeader>
+              <Modal.Header className="flex flex-col gap-1 border-b border-border shrink-0">
+                <Modal.Heading className="text-xl font-semibold text-foreground">
+                  {headingCopy.title}
+                </Modal.Heading>
+                <span className="text-sm font-normal text-muted-foreground">
+                  {headingCopy.subtitle}
+                </span>
+                {!isSubmitting && step !== "success" && <Modal.CloseTrigger />}
+              </Modal.Header>
 
-            <ModalBody>
-              <motion.div
-                variants={itemVariants}
-                className="flex items-center gap-4 rounded-xl border border-border bg-secondary p-3"
-                aria-label="Property summary"
-              >
-                <div className="h-16 w-16 shrink-0 overflow-hidden rounded-lg bg-accent">
-                  {propertyImage ? (
-                    <img
-                      src={propertyImage}
-                      alt={property?.title || "Property"}
-                      className="h-full w-full object-cover"
-                    />
-                  ) : (
-                    <div className="flex h-full w-full items-center justify-center text-secondary-foreground">
-                      <House className="h-6 w-6" aria-hidden="true" />
-                    </div>
-                  )}
-                </div>
-                <div className="flex min-w-0 flex-1 flex-col gap-1">
-                  <p className="truncate text-base font-medium text-foreground">
-                    {property?.title || "Untitled property"}
-                  </p>
-                  <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                    <MapPin
-                      className="h-3.5 w-3.5 shrink-0"
-                      aria-hidden="true"
-                    />
-                    <span className="truncate">
-                      {property?.location || "Location unavailable"}
-                    </span>
+              {/* min-h-0 + overflow-y-auto is what makes a flex child scrollable */}
+              <Modal.Body className="min-h-0 flex-1 overflow-y-auto py-6">
+                {/* Property summary always visible */}
+                <motion.div
+                  variants={itemVariants}
+                  className="flex items-center gap-4 rounded-xl border border-border bg-muted p-3"
+                  aria-label="Property summary"
+                >
+                  <div className="h-16 w-16 shrink-0 overflow-hidden rounded-lg bg-secondary">
+                    {propertyImage ? (
+                      <img
+                        src={propertyImage}
+                        alt={property?.title || "Property"}
+                        className="h-full w-full object-cover"
+                      />
+                    ) : (
+                      <div className="flex h-full w-full items-center justify-center text-muted-foreground">
+                        <House className="h-6 w-6" aria-hidden="true" />
+                      </div>
+                    )}
                   </div>
-                  <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm">
-                    <span className="text-muted-foreground">
-                      {property?.propertyType || "—"}
-                    </span>
-                    <span className="font-medium text-foreground">
-                      {formatCurrency(rentAmount)}
-                      <span className="text-muted-foreground">
-                        {" "}
-                        / {rentType}
-                      </span>
-                    </span>
-                  </div>
-                </div>
-              </motion.div>
-
-              <motion.div
-                variants={itemVariants}
-                className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2"
-              >
-                <Input
-                  isReadOnly
-                  label="Full Name"
-                  value={user?.name || ""}
-                  startContent={
-                    <FiUser
-                      className="text-muted-foreground"
-                      aria-hidden="true"
-                    />
-                  }
-                  aria-label="Full name"
-                  classNames={{
-                    inputWrapper: "bg-secondary border-border",
-                    input: "text-foreground",
-                    label: "text-muted-foreground",
-                  }}
-                />
-                <Input
-                  isReadOnly
-                  label="Email"
-                  value={user?.email || ""}
-                  startContent={
-                    <FiMail
-                      className="text-muted-foreground"
-                      aria-hidden="true"
-                    />
-                  }
-                  aria-label="Email address"
-                  classNames={{
-                    inputWrapper: "bg-secondary border-border",
-                    input: "text-foreground",
-                    label: "text-muted-foreground",
-                  }}
-                />
-              </motion.div>
-
-              <motion.div
-                variants={itemVariants}
-                className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2"
-              >
-                <div className="flex flex-col gap-1">
-                  <DatePicker
-                    label="Move-in Date"
-                    value={moveInDate}
-                    onChange={setMoveInDate}
-                    minValue={minDate}
-                    isRequired
-                    isDisabled={isSubmitting}
-                    isInvalid={!!errors.moveInDate}
-                    aria-label="Move-in date"
-                    classNames={{
-                      base: "w-full",
-                      inputWrapper: "bg-background border-border",
-                    }}
-                  />
-                  {errors.moveInDate && (
-                    <p
-                      className="flex items-center gap-1 text-xs text-foreground"
-                      role="alert"
-                    >
-                      <FiAlertCircle aria-hidden="true" />
-                      {errors.moveInDate}
+                  <div className="flex min-w-0 flex-1 flex-col gap-1">
+                    <p className="truncate text-base font-medium text-foreground">
+                      {property?.title || "Untitled property"}
                     </p>
-                  )}
-                </div>
-
-                <div className="flex flex-col gap-1">
-                  <Input
-                    label="Contact Number"
-                    placeholder="e.g. +880 1XXX-XXXXXX"
-                    value={contactNumber}
-                    onValueChange={setContactNumber}
-                    isRequired
-                    isDisabled={isSubmitting}
-                    isInvalid={!!errors.contactNumber}
-                    startContent={
-                      <FiPhone
-                        className="text-muted-foreground"
+                    <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                      <MapPin
+                        className="h-3.5 w-3.5 shrink-0"
                         aria-hidden="true"
                       />
-                    }
-                    aria-label="Contact number"
-                    classNames={{
-                      inputWrapper: "bg-background border-border",
-                      input: "text-foreground",
-                      label: "text-muted-foreground",
-                    }}
-                  />
-                  {errors.contactNumber && (
-                    <p
-                      className="flex items-center gap-1 text-xs text-foreground"
-                      role="alert"
-                    >
-                      <FiAlertCircle aria-hidden="true" />
-                      {errors.contactNumber}
-                    </p>
-                  )}
-                </div>
-              </motion.div>
+                      <span className="truncate">
+                        {property?.location || "Location unavailable"}
+                      </span>
+                    </div>
+                    <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm">
+                      <span className="text-muted-foreground">
+                        {property?.propertyType || "—"}
+                      </span>
+                      <span className="font-medium text-foreground">
+                        {formatCurrency(rentAmount)}
+                        <span className="text-muted-foreground">
+                          {" "}
+                          / {rentType}
+                        </span>
+                      </span>
+                    </div>
+                  </div>
+                </motion.div>
 
-              <motion.div variants={itemVariants} className="mt-4">
-                <Textarea
-                  label="Additional Notes"
-                  placeholder="Anything you'd like the host to know? (optional)"
-                  value={notes}
-                  onValueChange={(value) => {
-                    if (value.length <= 300) setNotes(value);
-                  }}
-                  isDisabled={isSubmitting}
-                  maxLength={300}
-                  description={`${notes.length}/300 characters`}
-                  startContent={
-                    <FiFileText
-                      className="text-muted-foreground"
+                {step === "details" && (
+                  <>
+                    <motion.div
+                      variants={itemVariants}
+                      className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2"
+                    >
+                      <TextField isReadOnly aria-label="Full name">
+                        <Label className="text-muted-foreground">
+                          Full Name
+                        </Label>
+                        <Input
+                          value={user?.name || ""}
+                          startContent={
+                            <FiUser
+                              className="text-muted-foreground"
+                              aria-hidden="true"
+                            />
+                          }
+                          className="border-border bg-muted text-foreground"
+                        />
+                      </TextField>
+                      <TextField isReadOnly aria-label="Email address">
+                        <Label className="text-muted-foreground">Email</Label>
+                        <Input
+                          value={user?.email || ""}
+                          startContent={
+                            <FiMail
+                              className="text-muted-foreground"
+                              aria-hidden="true"
+                            />
+                          }
+                          className="border-border bg-muted text-foreground"
+                        />
+                      </TextField>
+                    </motion.div>
+
+                    <motion.div
+                      variants={itemVariants}
+                      className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2"
+                    >
+                      <div className="flex flex-col gap-1">
+                        <DatePicker
+                          value={moveInDate}
+                          onChange={setMoveInDate}
+                          minValue={minDate}
+                          isRequired
+                          isDisabled={isSubmitting}
+                          isInvalid={!!errors.moveInDate}
+                        >
+                          <Label className="text-foreground">
+                            Move-in Date
+                          </Label>
+                          <DateField.Group className="border-border bg-background text-foreground">
+                            <DateField.Input>
+                              {(segment) => (
+                                <DateField.Segment
+                                  segment={segment}
+                                  className="text-foreground"
+                                />
+                              )}
+                            </DateField.Input>
+                            <DateField.Suffix>
+                              <DatePicker.Trigger>
+                                <DatePicker.TriggerIndicator className="text-muted-foreground" />
+                              </DatePicker.Trigger>
+                            </DateField.Suffix>
+                          </DateField.Group>
+                          <DatePicker.Popover>
+                            <Calendar
+                              aria-label="Choose move-in date"
+                              className="bg-background text-foreground"
+                            >
+                              <Calendar.Header>
+                                <Calendar.Heading className="text-foreground" />
+                                <Calendar.NavButton slot="previous" />
+                                <Calendar.NavButton slot="next" />
+                              </Calendar.Header>
+                              <Calendar.Grid>
+                                <Calendar.GridHeader>
+                                  {(day) => (
+                                    <Calendar.HeaderCell className="text-muted-foreground">
+                                      {day}
+                                    </Calendar.HeaderCell>
+                                  )}
+                                </Calendar.GridHeader>
+                                <Calendar.GridBody>
+                                  {(date) => (
+                                    <Calendar.Cell
+                                      date={date}
+                                      className="text-foreground data-[selected=true]:bg-primary data-[selected=true]:text-primary-foreground"
+                                    />
+                                  )}
+                                </Calendar.GridBody>
+                              </Calendar.Grid>
+                            </Calendar>
+                          </DatePicker.Popover>
+                        </DatePicker>
+                        {errors.moveInDate && (
+                          <p
+                            className="flex items-center gap-1 text-xs text-red-600"
+                            role="alert"
+                          >
+                            <FiAlertCircle aria-hidden="true" />
+                            {errors.moveInDate}
+                          </p>
+                        )}
+                      </div>
+
+                      <TextField
+                        isRequired
+                        isDisabled={isSubmitting}
+                        isInvalid={!!errors.contactNumber}
+                        value={contactNumber}
+                        onChange={setContactNumber}
+                      >
+                        <Label className="text-foreground">
+                          Contact Number
+                        </Label>
+                        <InputGroup>
+                          <InputGroup.Prefix>
+                            <FiPhone
+                              className="size-4 text-muted-foreground"
+                              aria-hidden="true"
+                            />
+                          </InputGroup.Prefix>
+                          <InputGroup.Input
+                            placeholder="e.g. +880 1XXX-XXXXXX"
+                            className="placeholder:text-muted-foreground"
+                          />
+                        </InputGroup>
+                        {errors.contactNumber && (
+                          <FieldError className="text-xs text-red-600">
+                            {errors.contactNumber}
+                          </FieldError>
+                        )}
+                      </TextField>
+                    </motion.div>
+
+                    <motion.div variants={itemVariants} className="mt-4">
+                      <TextField
+                        isDisabled={isSubmitting}
+                        aria-label="Additional notes"
+                      >
+                        <Label className="flex items-center gap-1.5 text-foreground">
+                          <FiFileText
+                            className="text-muted-foreground"
+                            aria-hidden="true"
+                          />
+                          Additional Notes
+                        </Label>
+                        <TextArea
+                          placeholder="Anything you'd like the host to know? (optional)"
+                          value={notes}
+                          onChange={(e) => {
+                            if (e.target.value.length <= 300)
+                              setNotes(e.target.value);
+                          }}
+                          maxLength={300}
+                          className="placeholder:text-muted-foreground border-border bg-background text-foreground"
+                        />
+                        <Description className="text-muted-foreground">
+                          {notes.length}/300 characters
+                        </Description>
+                      </TextField>
+                    </motion.div>
+
+                    <motion.div
+                      variants={itemVariants}
+                      className="mt-6 rounded-xl border border-border bg-muted p-4"
+                      aria-label="Booking summary"
+                    >
+                      <div className="mb-3 flex items-center gap-2 text-foreground">
+                        <CreditCard className="h-4 w-4" aria-hidden="true" />
+                        <span className="text-sm font-medium">
+                          Booking Summary
+                        </span>
+                      </div>
+                      <div className="flex flex-col gap-2 text-sm">
+                        <div className="flex items-center justify-between">
+                          <span className="text-muted-foreground">
+                            Rent Amount
+                          </span>
+                          <span className="text-foreground">
+                            {formatCurrency(rentAmount)}
+                          </span>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <span className="text-muted-foreground">
+                            Booking Fee
+                          </span>
+                          <span className="text-foreground">
+                            {formatCurrency(bookingFee)}
+                          </span>
+                        </div>
+                        <div className="mt-1 flex items-center justify-between border-t border-border pt-2">
+                          <span className="font-medium text-foreground">
+                            Total Payable
+                          </span>
+                          <span className="font-semibold text-foreground">
+                            {formatCurrency(totalPayable)}
+                          </span>
+                        </div>
+                      </div>
+                    </motion.div>
+                  </>
+                )}
+
+                {step === "payment" && (
+                  <>
+                    <motion.div
+                      variants={itemVariants}
+                      className="mt-6 rounded-xl border border-border bg-muted p-4"
+                    >
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-muted-foreground">
+                          Total Payable
+                        </span>
+                        <span className="text-lg font-semibold text-foreground">
+                          {formatCurrency(totalPayable)}
+                        </span>
+                      </div>
+                    </motion.div>
+
+                    <motion.div variants={itemVariants} className="mt-5">
+                      <RadioGroup
+                        name="paymentMethod"
+                        value={paymentMethod}
+                        onChange={setPaymentMethod}
+                        isDisabled={isSubmitting}
+                        className="gap-2"
+                      >
+                        <Label className="mb-1 text-foreground">
+                          Payment Method
+                        </Label>
+                        {PAYMENT_METHODS.map((method) => (
+                          <Radio
+                            key={method.id}
+                            value={method.id}
+                            className="group block w-full"
+                          >
+                            <Radio.Content className="flex w-full cursor-pointer items-start gap-3 rounded-lg border border-border p-3 text-foreground hover:border-accent/50 group-data-[selected=true]:border-accent group-data-[selected=true]:bg-accent/10">
+                              <Radio.Control>
+                                <Radio.Indicator />
+                              </Radio.Control>
+                              <FiSmartphone
+                                className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground"
+                                aria-hidden="true"
+                              />
+                              <div className="flex flex-col gap-0.5">
+                                <span className="text-sm font-medium text-foreground">
+                                  {method.label}
+                                </span>
+                                <span className="text-xs text-muted-foreground">
+                                  {method.description}
+                                </span>
+                              </div>
+                            </Radio.Content>
+                          </Radio>
+                        ))}
+                      </RadioGroup>
+                    </motion.div>
+                  </>
+                )}
+
+                {step === "success" && (
+                  <motion.div
+                    variants={itemVariants}
+                    className="mt-6 flex flex-col items-center gap-3 rounded-xl border border-green-300 bg-green-50 p-8 text-center"
+                  >
+                    <FiCheckCircle
+                      className="h-10 w-10 text-green-600"
                       aria-hidden="true"
                     />
-                  }
-                  aria-label="Additional notes"
-                  classNames={{
-                    inputWrapper: "bg-background border-border",
-                    input: "text-foreground",
-                    label: "text-muted-foreground",
-                    description: "text-muted-foreground",
-                  }}
-                />
-              </motion.div>
+                    <p className="text-base font-medium text-foreground">
+                      Payment of {formatCurrency(totalPayable)} received
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      A confirmation has been sent to{" "}
+                      {user?.email || "your email"}. The host will reach out to
+                      finalize your move-in.
+                    </p>
+                  </motion.div>
+                )}
+              </Modal.Body>
 
-              <motion.div
-                variants={itemVariants}
-                className="mt-6 rounded-xl border border-border bg-secondary p-4"
-                aria-label="Booking summary"
-              >
-                <div className="mb-3 flex items-center gap-2 text-secondary-foreground">
-                  <CreditCard className="h-4 w-4" aria-hidden="true" />
-                  <span className="text-sm font-medium">Booking Summary</span>
-                </div>
-                <div className="flex flex-col gap-2 text-sm">
-                  <div className="flex items-center justify-between">
-                    <span className="text-muted-foreground">Rent Amount</span>
-                    <span className="text-foreground">
-                      {formatCurrency(rentAmount)}
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-muted-foreground">Booking Fee</span>
-                    <span className="text-foreground">
-                      {formatCurrency(bookingFee)}
-                    </span>
-                  </div>
-                  <div className="mt-1 flex items-center justify-between border-t border-border pt-2">
-                    <span className="font-medium text-foreground">
-                      Total Payable
-                    </span>
-                    <span className="font-semibold text-foreground">
-                      {formatCurrency(totalPayable)}
-                    </span>
-                  </div>
-                </div>
-              </motion.div>
-            </ModalBody>
+              <Modal.Footer className="shrink-0 border-t border-border">
+                {step === "details" && (
+                  <>
+                    <Button
+                      variant="ghost"
+                      onPress={handleClose}
+                      isDisabled={isSubmitting}
+                      aria-label="Cancel booking"
+                      className="text-primary"
+                    >
+                      Cancel
+                    </Button>
+                    <Button
+                      variant="primary"
+                      onPress={handleContinueToPayment}
+                      isDisabled={isSubmitting}
+                      aria-label="Continue to payment"
+                      className="bg-primary text-primary-foreground"
+                    >
+                      Continue to Payment
+                    </Button>
+                  </>
+                )}
 
-            <ModalFooter className="border-t border-border">
-              <Button
-                variant="ghost"
-                className="text-muted-foreground"
-                onPress={onClose}
-                isDisabled={isSubmitting}
-                aria-label="Cancel booking"
-              >
-                Cancel
-              </Button>
-              <Button
-                className="bg-accent text-accent-foreground"
-                onPress={handleConfirm}
-                isDisabled={isSubmitting}
-                isLoading={isSubmitting}
-                aria-label="Continue to payment"
-              >
-                {isSubmitting ? "Processing..." : "Continue to Payment"}
-              </Button>
-            </ModalFooter>
-          </motion.div>
-        )}
-      </ModalContent>
+                {step === "payment" && (
+                  <>
+                    <Button
+                      variant="ghost"
+                      onPress={() => setStep("details")}
+                      isDisabled={isSubmitting}
+                      aria-label="Back to details"
+                      className="text-primary"
+                    >
+                      Back
+                    </Button>
+                    <Button
+                      variant="primary"
+                      onPress={handlePayNow}
+                      isPending={isSubmitting}
+                      aria-label="Confirm and pay"
+                      className="bg-primary text-primary-foreground"
+                    >
+                      {({ isPending }) => (
+                        <>
+                          {isPending && <Spinner size="sm" color="current" />}
+                          {isPending
+                            ? "Processing payment..."
+                            : `Pay ${formatCurrency(totalPayable)}`}
+                        </>
+                      )}
+                    </Button>
+                  </>
+                )}
+
+                {step === "success" && (
+                  <Button
+                    variant="primary"
+                    onPress={handleClose}
+                    aria-label="Close"
+                    className="ml-auto bg-primary text-primary-foreground"
+                  >
+                    Done
+                  </Button>
+                )}
+              </Modal.Footer>
+            </motion.div>
+          </Modal.Dialog>
+        </Modal.Container>
+      </Modal.Backdrop>
     </Modal>
   );
 }

@@ -5,7 +5,7 @@ import ReviewsSection from "@/components/propertydetails/ReviewsSection";
 
 import { getReviewsByPropertyId } from "@/lib/core/reviews";
 import { getPropertyById } from "@/lib/getproperty";
-
+import { getUser } from "@/lib/getUserInSever";
 
 export async function generateMetadata({ params }) {
   const { id } = await params;
@@ -18,8 +18,9 @@ export async function generateMetadata({ params }) {
   };
 }
 
-
 const PropertyDetailsPage = async ({ params }) => {
+  const user = await getUser();
+
   const { id } = await params;
   const property = await getPropertyById(id);
 
@@ -61,7 +62,7 @@ const PropertyDetailsPage = async ({ params }) => {
           {/* RIGHT — sticky booking */}
           <aside>
             {/* 3. Booking section */}
-            <BookingSection property={property} />
+            <BookingSection property={property} user={user} />
           </aside>
         </div>
       </div>

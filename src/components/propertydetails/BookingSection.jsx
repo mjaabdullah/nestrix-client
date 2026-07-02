@@ -1,11 +1,13 @@
 "use client";
 
+import { useOverlayState } from "@heroui/react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import BookingModal from "./BookingModal";
 
 const BookingSection = ({ property, user }) => {
   const router = useRouter();
-  const [isOpen, setIsOpen] = useState(false);
+  const state = useOverlayState();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState(null);
 
@@ -29,7 +31,7 @@ const BookingSection = ({ property, user }) => {
 
       const booking = await response.json();
 
-      setIsOpen(false);
+      state.close();
       router.push(`/payment/${booking._id}`);
     } catch (err) {
       setError(err.message || "Something went wrong. Please try again.");
@@ -79,7 +81,7 @@ const BookingSection = ({ property, user }) => {
 
       {/* Book button */}
       <button
-        onClick={() => setIsOpen(true)}
+        onClick={() => state.open()}
         disabled={isSubmitting}
         aria-label="Book this property"
         className="w-full bg-primary text-primary-foreground text-sm font-medium py-3 rounded-sm hover:opacity-90 active:scale-[0.98] transition-all duration-150 disabled:opacity-60 disabled:cursor-not-allowed"
@@ -87,14 +89,13 @@ const BookingSection = ({ property, user }) => {
         {isSubmitting ? "Please wait..." : "Book Property"}
       </button>
 
-      {/* <BookingModal
-        isOpen={isOpen}
-        onOpenChange={setIsOpen}
+      <BookingModal
+        state={state}
         property={property}
         user={user}
         onConfirmBooking={handleConfirmBooking}
         isSubmitting={isSubmitting}
-      /> */}
+      />
     </div>
   );
 };
