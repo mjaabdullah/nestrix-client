@@ -20,11 +20,13 @@ import {
 } from "@heroui/react";
 import { getLocalTimeZone, today } from "@internationalized/date";
 import { motion } from "framer-motion";
+import Image from "next/image";
 import { useState } from "react";
 import {
   FiAlertCircle,
   FiCheckCircle,
   FiFileText,
+  FiLoader,
   FiMail,
   FiPhone,
   FiSmartphone,
@@ -90,7 +92,7 @@ export default function BookingModal({
 
   const rentAmount = property?.rent;
   const rentType = property?.rentType || "month";
-  const bookingFee = property?.bookingFee;
+  const bookingFee = property?.bookingFee || 0;
   const totalPayable =
     property?.totalPayable !== undefined && property?.totalPayable !== null
       ? property.totalPayable
@@ -120,6 +122,9 @@ export default function BookingModal({
     if (!moveInDate) {
       nextErrors.moveInDate = "Move-in date is required.";
     }
+    if (moveInDate && moveInDate < minDate) {
+      nextErrors.moveInDate = "Move-in date cannot be in the past.";
+    }
     if (!contactNumber || contactNumber.trim().length === 0) {
       nextErrors.contactNumber = "Contact number is required.";
     }
@@ -144,9 +149,10 @@ export default function BookingModal({
       rentAmount,
       bookingFee,
       totalPayable,
+      userEmail: user?.email || null,
     });
 
-    setStep("success");
+    setStep("paymentProcessing");
   }
 
   const headingCopy = {
@@ -157,6 +163,10 @@ export default function BookingModal({
     payment: {
       title: "Choose Payment Method",
       subtitle: "Select how you'd like to pay the total amount below.",
+    },
+    paymentProcessing: {
+      title: "Processing Payment",
+      subtitle: "Please wait while we process your payment.",
     },
     success: {
       title: "Booking Confirmed",
@@ -180,7 +190,7 @@ export default function BookingModal({
               animate="visible"
               className="flex min-h-0 flex-1 flex-col"
             >
-              <Modal.Header className="flex flex-col gap-1 border-b border-border shrink-0">
+              <Modal.Header className="flex flex-col gap-1 border-b border-border pb-2.5 shrink-0">
                 <Modal.Heading className="text-xl font-semibold text-foreground">
                   {headingCopy.title}
                 </Modal.Heading>
@@ -200,8 +210,10 @@ export default function BookingModal({
                 >
                   <div className="h-16 w-16 shrink-0 overflow-hidden rounded-lg bg-secondary">
                     {propertyImage ? (
-                      <img
+                      <Image
                         src={propertyImage}
+                        width={100}
+                        height={100}
                         alt={property?.title || "Property"}
                         className="h-full w-full object-cover"
                       />
@@ -282,7 +294,9 @@ export default function BookingModal({
                       <div className="flex flex-col gap-1">
                         <DatePicker
                           value={moveInDate}
-                          onChange={setMoveInDate}
+                          onChange={(e) => {
+                            setMoveInDate(e);
+                          }}
                           minValue={minDate}
                           isRequired
                           isDisabled={isSubmitting}
@@ -503,6 +517,31 @@ export default function BookingModal({
                   </>
                 )}
 
+                {step === "paymentProcessing" && (
+                  <motion.div
+                    variants={itemVariants}
+                    className="mt-6 flex flex-col items-center gap-3 rounded-xl border border-blue-300 bg-blue-50 p-8 text-center"
+                  >
+                    <FiLoader
+                      className="h-10 w-10 animate-spin  text-blue-600"
+                      aria-hidden="true"
+                      style={{ animationDuration: "3s" }}
+                    />
+
+                    <p className="text-base font-medium text-foreground">
+                      Processing your payment...
+                    </p>
+
+                    <p className="text-sm text-muted-foreground">
+                      We're securely processing your payment of{" "}
+                      <span className="font-medium text-foreground">
+                        {formatCurrency(totalPayable)}
+                      </span>
+                      . This usually takes only a few moments.
+                    </p>
+                  </motion.div>
+                )}
+
                 {step === "success" && (
                   <motion.div
                     variants={itemVariants}
@@ -524,7 +563,7 @@ export default function BookingModal({
                 )}
               </Modal.Body>
 
-              <Modal.Footer className="shrink-0 border-t border-border">
+              <Modal.Footer className="shrink-0 border-t border-border pt-2.5">
                 {step === "details" && (
                   <>
                     <Button
@@ -576,6 +615,16 @@ export default function BookingModal({
                       )}
                     </Button>
                   </>
+                )}
+                {step === "paymentProcessing" && (
+                  <Button
+                    variant="primary"
+                    onPress={handleClose}
+                    aria-label="Close"
+                    className="ml-auto bg-primary text-primary-foreground"
+                  >
+                    Done
+                  </Button>
                 )}
 
                 {step === "success" && (

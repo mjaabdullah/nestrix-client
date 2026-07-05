@@ -16,30 +16,32 @@ const BookingSection = ({ property, user }) => {
     setError(null);
 
     try {
-      const response = await fetch("/api/bookings", {
+      const response = await fetch("/api/booking", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ...formData,
           userId: user?._id,
+          propertyId: property?._id,
         }),
       });
 
+      const data = await response.json();
+
       if (!response.ok) {
-        throw new Error("Booking failed. Please try again.");
+        throw new Error(data.error || "Booking failed. Please try again.");
       }
 
-      const booking = await response.json();
+      console.log("Booking successful:", data);
 
       state.close();
-      router.push(`/payment/${booking._id}`);
+      window.location.href = data.url;
     } catch (err) {
       setError(err.message || "Something went wrong. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
   };
-
   return (
     <div className="border border-border rounded-sm p-6 bg-background lg:sticky lg:top-24">
       {/* Price */}

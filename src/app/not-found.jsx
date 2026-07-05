@@ -1,7 +1,5 @@
 "use client";
 
-import Footer from "@/components/shared/Footer";
-import NavBar from "@/components/shared/NavBar";
 import { ArrowLeft, House } from "@gravity-ui/icons";
 import { Button } from "@heroui/react";
 import { motion } from "framer-motion";
@@ -17,7 +15,6 @@ export default function NotFound() {
 
   return (
     <>
-      <NavBar />
       <main
         className="min-h-[calc(100vh-4rem)] flex items-center justify-center px-4 bg-background"
         aria-labelledby="not-found-heading"
@@ -115,7 +112,6 @@ export default function NotFound() {
           </motion.div>
         </motion.div>
       </main>
-      <Footer />
     </>
   );
 }
