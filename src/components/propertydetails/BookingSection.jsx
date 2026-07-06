@@ -21,7 +21,7 @@ const BookingSection = ({ property, user }) => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ...formData,
-          userId: user?._id,
+          userId: user?.id,
           propertyId: property?._id,
         }),
       });
@@ -32,7 +32,6 @@ const BookingSection = ({ property, user }) => {
         throw new Error(data.error || "Booking failed. Please try again.");
       }
 
-      console.log("Booking successful:", data);
 
       state.close();
       window.location.href = data.url;

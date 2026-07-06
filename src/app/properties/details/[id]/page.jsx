@@ -21,6 +21,7 @@ export async function generateMetadata({ params }) {
 const PropertyDetailsPage = async ({ params }) => {
   const user = await getUser();
 
+
   const { id } = await params;
   const property = await getPropertyById(id);
 
