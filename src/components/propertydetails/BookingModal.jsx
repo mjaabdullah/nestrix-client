@@ -17,6 +17,7 @@ import {
   Spinner,
   TextArea,
   TextField,
+  toast,
 } from "@heroui/react";
 import { getLocalTimeZone, today } from "@internationalized/date";
 import { motion } from "framer-motion";
@@ -140,6 +141,12 @@ export default function BookingModal({
   async function handlePayNow() {
     if (isSubmitting) return;
 
+    if (paymentMethod !== "card") {
+      toast.warning(
+        "Currently, only card payments are supported. Please select 'Debit / Credit Card' as your payment method.",
+      );
+      return;
+    }
     await onConfirmBooking({
       propertyId: property?._id,
       moveInDate: moveInDate ? moveInDate.toString() : null,

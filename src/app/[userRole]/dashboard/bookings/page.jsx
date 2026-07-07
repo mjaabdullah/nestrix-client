@@ -76,27 +76,26 @@ const MOCK_SERVER_DATA = [
 export default async function BookingsPage({ searchParams }) {
   const resolvedParams = await searchParams;
   const currentPage = Number(resolvedParams?.page || 1);
-  const limit = Number(resolvedParams?.limit || 2);
   const user = await getUser();
 
   const data = await getBookings(user?.id, currentPage);
   console.log(data, "in server");
 
   // Pure Server Side Metrics Aggregations
-  const totalBookings = data.totalBookings;
-  const approvedBookings = data.data.filter(
+  const totalBookings = data?.totalBookings;
+  const approvedBookings = data?.data?.filter(
     (b) => b.bookingStatus.toLowerCase() === "approved",
   ).length;
-  const pendingBookings = data.data.filter(
+  const pendingBookings = data?.data?.filter(
     (b) => b.bookingStatus.toLowerCase() === "pending",
   ).length;
-  const totalAmountPaid = data.data.reduce(
+  const totalAmountPaid = data?.data?.reduce(
     (acc, curr) => acc + parseFloat(curr.amountPaid),
     0,
   );
 
-  const paginatedBookings = data.data;
-  const totalPages = data.totalPages;
+  const paginatedBookings = data?.data;
+  const totalPages = data?.totalPages;
 
   const summaryMetrics = {
     totalBookings,
