@@ -36,6 +36,7 @@ const PaymentSuccessPage = async ({ searchParams }) => {
       notes,
       amountPaid: (amount_total / 100).toFixed(2),
       paymentStatus: "paid",
+      bookingStatus: "pending",
     };
 
     await createBookingFromWebhook(newBooking);

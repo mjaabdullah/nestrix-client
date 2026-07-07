@@ -23,6 +23,7 @@ export default function DashboardSidebar({
       aria-label="Sidebar navigation"
     >
       {/* Logo */}
+
       <DashboardLogo collapsed={collapsed} />
 
       {/* Divider */}
